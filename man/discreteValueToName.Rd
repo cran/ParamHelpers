@@ -1,0 +1,25 @@
+\name{discreteValueToName}
+\alias{discreteValueToName}
+\title{Convert discrete value(s) to encoding name(s).}
+\usage{
+  discreteValueToName(par, x)
+}
+\arguments{
+  \item{par}{[\code{\link{Param}}]\cr Discrete parameter or
+  discrete vector.}
+
+  \item{x}{[any]\cr Parameter value or a list of values for
+  a discrete vector.}
+}
+\value{
+  [\code{character}]. Single name for a discrete parameter
+  or a character vector of names for a discrete vector.
+}
+\description{
+  Convert discrete value(s) to encoding name(s).
+}
+\examples{
+p <- makeDiscreteParam("u", values=c(x1="a", x2="b", x3="c"))
+discreteValueToName(p, "b")
+}
+
