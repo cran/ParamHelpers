@@ -27,8 +27,11 @@ test_that("integer vector sampling", {
   r = sampleValues(p, 1000)
   r = do.call(rbind, r)
   expect_true(all(r >= p$lower & r <= p$upper))
-  r = as.numeric(table(r))
-  expect_true(all(r > 600 & r < 730))
+  # this is stochastic, we dont want that on CRAN as it can fail
+  if (interactive()) {
+    r = as.numeric(table(r))
+    expect_true(all(r > 600 & r < 730))
+  }
 })
 
 
