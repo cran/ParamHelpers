@@ -1,5 +1,6 @@
-3c4dc8956d55c9e494cc7a997c6632b9 *DESCRIPTION
+69e2644d0c4c23c254dddeb3af4af80a *DESCRIPTION
 372aaf369c1a87d305234f2946a6f922 *NAMESPACE
+ae84db413597a76dca58851df95e11a2 *NEWS
 3a7f7d3bbe6262b828419c20cc0b28e2 *R/LearnerParam.R
 678ebf1de2fb1f02731fe59595c7dfb3 *R/OptPath.R
 ec7d2afdc3b7b3c23dfed89f3ac0467a *R/OptPathDF.R
@@ -27,7 +28,7 @@ b5108c0feebae517a23dbb23c48daa7c *inst/tests/test_ParamSet.R
 7fe9d599bb4c1df6f037ba7933e656b8 *inst/tests/test_filterParams.R
 c656ea99322a1d6df42e8e139527c97b *inst/tests/test_generateDesign.R
 281c9acfec1363101db35d6e31db6108 *inst/tests/test_paramValueToString.R
-d76d2443a2a92e5ff9990ea51bb4daba *inst/tests/test_sample.R
+cb42b42a1640798eb68c1d82288bb6c1 *inst/tests/test_sample.R
 7eab744f4abffddf1f87ff6fc9a57204 *inst/tests/test_trafo.R
 1bbbf6b4e6469b964e74440f2e3c253c *man/LearnerParam.Rd
 618985882c0263090c02ea2bf772a701 *man/OptPath.Rd
