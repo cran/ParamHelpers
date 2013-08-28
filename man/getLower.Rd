@@ -22,7 +22,7 @@ ps <- makeParamSet(
   makeNumericParam("u"),
   makeIntegerParam("v", lower=1, upper=2),
   makeDiscreteParam("w", values=1:2),
-  makeNumericVectorParam("x", length=2, lower=c(0, 10), upper=c(1, 11))
+  makeNumericVectorParam("x", len=2, lower=c(0, 10), upper=c(1, 11))
 )
 getLower(ps)
 }

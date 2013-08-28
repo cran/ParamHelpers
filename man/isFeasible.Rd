@@ -16,7 +16,12 @@
 }
 \description{
   Check if a parameter value satisfies the constraints of
-  the parameter description.
+  the parameter description. This includes the
+  \code{requires} expressions, if \code{par} is a
+  \code{\link{ParamSet}}. If \code{requires} is not
+  satisfied, the parameter value must be set to scalar
+  \code{NA} to be still feasible, a single scalar even in a
+  case of a vector parameter.
 }
 \examples{
 p <- makeNumericParam("x", lower=-1, upper=1)

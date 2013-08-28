@@ -12,7 +12,8 @@
   types, subset of: \dQuote{numeric}, \dQuote{integer},
   \dQuote{numericvector}, \dQuote{integervector},
   \dQuote{discrete}, \dQuote{discretevector},
-  \dQuote{logical}, \dQuote{function}, \dQuote{untyped}.}
+  \dQuote{logical}, \dQuote{logicalvector},
+  \dQuote{function}, \dQuote{untyped}.}
 }
 \value{
   [\code{\link{ParamSet}}].

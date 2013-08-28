@@ -1,18 +1,18 @@
 #' Create optimization path.
-#' 
-#' Optimizers can log their evaluated points
-#' iteratively into this object. Can be converted into a data.frame with
-#' \code{as.data.frame}.
-#' 
+#'
+#' Optimizers can iteratively log their evaluated points
+#' into this object. Can be converted into a data.frame with
+#' \code{as.data.frame(x, discrete.as.factor = TRUE / FALSE)}.
+#'
 #' A optimization path has a number of path elements, where each element consists of: the value of the
 #' decision variables at this point, the values of the performance measures at this point, the date-of-birth (dob)
-#' of this point and the end-of-life (eol) of this point.    
+#' of this point and the end-of-life (eol) of this point.
 #'
-#' For discrete parameters always the name of the value is stored as a character. 
-#' When you retrieve an element with \code{\link{getOptPathEl}} this name is converted to the actual discrete value.
+#' For discrete parameters always the name of the value is stored as a character.
+#' When you retrieve an element with \code{\link{getOptPathEl}}, this name is converted to the actual discrete value.
 #'
 #' If parameters have associated transformation you are free to decide whether you want to
-#' add x values before or after transformation, see argument \code{add.transformed.x} and 
+#' add x values before or after transformation, see argument \code{add.transformed.x} and
 #' \code{\link{trafoOptPath}}.
 #'
 #' The S3 class is a list which stores at least these elements:
@@ -24,14 +24,15 @@
 #' \item{env [\code{environment}]}{Environment which stores the optimization path. Contents depend on implementation.}
 #' }
 #'
-#' @param par.set [\code{\link{ParamSet}}]\cr 
+#' @param par.set [\code{\link{ParamSet}}]\cr
 #'   Parameter set for the decision variables that are optimized.
-#' @param y.names [\code{logical(1)}]\cr 
+#' @param y.names [\code{character}]\cr
 #'   Names of performance measures that are optimized or logged.
-#' @param minimize [\code{logical(1)}]\cr 
+#' @param minimize [\code{logical}]\cr
 #'   Which of the performance measures in y.names should be minimized?
-#' @param add.transformed.x [\code{logical(1)}]\cr 
-#'   If some parameters have associated transformations, are you going to 
+#'   Vector of booleans in the same order as \code{y.names}.
+#' @param add.transformed.x [\code{logical(1)}]\cr
+#'   If some parameters have associated transformations, are you going to
 #'   add x values after they have been transformed?
 #'   Default is \code{FALSE}.
 #' @name OptPath
@@ -40,7 +41,7 @@
 NULL
 
 makeOptPath = function(par.set, y.names, minimize, add.transformed.x=FALSE) {
-  ok = c("numeric", "integer", "numericvector", "integervector", "logical", "discrete", "discretevector")
+  ok = c("numeric", "integer", "numericvector", "integervector", "logical", "logicalvector", "discrete", "discretevector")
   if(length(par.set$pars) > length(filterParams(par.set, ok)$pars))
     stop("OptPath can currently only be used for: ", paste(ok, collapse=","))
   x.names = getParamIds(par.set)
@@ -68,7 +69,7 @@ makeOptPath = function(par.set, y.names, minimize, add.transformed.x=FALSE) {
 #' @S3method print OptPath
 print.OptPath = function(x, ...) {
   catf("Optimization path")
-  catf("  Dimensions: x=%i/%i, y=%i", 
+  catf("  Dimensions: x=%i/%i, y=%i",
     length(x$par.set$pars), sum(getParamLengths(x$par.set)), length(x$y.names))
   catf("  Length: %i", getOptPathLength(x))
   catf("  Add x values transformed: %s", x$add.transformed.x)
@@ -76,21 +77,27 @@ print.OptPath = function(x, ...) {
 
 
 #' Get the length of the optimization path.
-#' 
-#' @param op [\code{\link{OptPath}}]\cr 
-#'   Optimization path.  
+#'
+#' Dependent parameters whose requirements are not satisfied are represented by a scalar NA in the output.
+#'
+#' @param op [\code{\link{OptPath}}]\cr
+#'   Optimization path.
 #' @return [\code{integer(1)}]
-#' @export 
+#' @export
 getOptPathLength = function(op) {
   UseMethod("getOptPathLength")
 }
 
 #' Get an element from the optimization path.
 #'
+#' Dependent parameters whose requirements 
+#' are not satisfied are represented by a scalar NA in the elements of \code{x} 
+#' of the return value.
+#'
 #' @param op [\code{\link{OptPath}}]\cr
 #'   Optimization path.
-#' @param index [\code{integer(1)}] 
-#'   Index of element.  
+#' @param index [\code{integer(1)}]\cr
+#'   Index of element.
 #' @return List with elements \code{x} [named \code{list}], \code{y} [named \code{numeric}],
 #'   \code{dob} [\code{integer(1)}] and \code{eol} [\code{integer(1)}].
 #' @rdname getOptPathEl
@@ -99,28 +106,31 @@ getOptPathEl = function(op, index) {
   UseMethod("getOptPathEl")
 }
 #' Add a new element to an optimization path.
-#' 
+#'
 #' Changes the argument in-place.
 #' Note that when adding parameters that have associated tranformations, it is probably
 #' best to add the untransformed values to the path. Otherwise you have to switch off the
-#' feasibility check, as constraints might now not hold anymore. 
-#' @param op [\code{\link{OptPath}}] \cr 
-#'   Optimization path.  
-#' @param x [\code{list}]\cr 
-#'   List of parameter values for a point in input space. Must be in same order as parameters.  
-#' @param y [\code{numeric}]\cr 
+#' feasibility check, as constraints might now not hold anymore.
+#'
+#' Dependent parameters whose requirements are not satisfied must be represented by a scalar NA in the input.
+#' 
+#' @param op [\code{\link{OptPath}}] \cr
+#'   Optimization path.
+#' @param x [\code{list}]\cr
+#'   List of parameter values for a point in input space. Must be in same order as parameters.
+#' @param y [\code{numeric}]\cr
 #'   Vector of fitness values.  Must be in same order as \code{y.names}.
-#' @param dob [\code{integer(1)}]\cr 
-#'   Date of birth of the new parameters. 
-#'   Default is length of path + 1.  
-#' @param eol [\code{integer(1)}]\cr 
-#'   End of life of point. 
-#'   Default is \code{NA}. 
-#' @param check.feasible [\code{logical(1)}]\cr 
+#' @param dob [\code{integer(1)}]\cr
+#'   Date of birth of the new parameters.
+#'   Default is length of path + 1.
+#' @param eol [\code{integer(1)}]\cr
+#'   End of life of point.
+#'   Default is \code{NA}.
+#' @param check.feasible [\code{logical(1)}]\cr
 #'   Should \code{x} be checked with \code{\link{isFeasible}}?
 #'   Default is \code{TRUE}.
 #' @return Nothing.
-#' @export 
+#' @export
 #' @examples
 #' ps <- makeParamSet(
 #'   makeNumericParam("p1"),
@@ -131,25 +141,25 @@ getOptPathEl = function(op, index) {
 #' addOptPathEl(op, x=list(p1=-1, p2="a"), y=2)
 #' as.data.frame(op)
 addOptPathEl = function(op, x, y, dob=getOptPathLength(op)+1L, eol=as.integer(NA), check.feasible=!op$add.transformed.x) {
-  UseMethod("addOptPathEl")  
+  UseMethod("addOptPathEl")
 }
 
 #' Get index of the best element from optimization path.
 #'
 #' @param op [\code{\link{OptPath}}]\cr
 #'   Optimization path.
-#' @param y.name [\code{character(1)}] 
+#' @param y.name [\code{character(1)}]\cr
 #'   Name of target value to decide which element is best.
-#'   Default is \code{y.names[1]}.  
+#'   Default is \code{y.names[1]}.
 #' @param dob [\code{integer}]\cr
-#'   Possible dates of birth to select best element from. Defaults to all. 
+#'   Possible dates of birth to select best element from. Defaults to all.
 #' @param eol [\code{integer}]\cr
-#'   Possible end of life to select best element from. Defaults to all. 
+#'   Possible end of life to select best element from. Defaults to all.
 #' @param ties [\code{character(1)}]\cr
 #'   How should ties be broken when more than one optimal element is found?
-#'   \dQuote{all}: return all indices, 
+#'   \dQuote{all}: return all indices,
 #'   \dQuote{first}: return first optimal element in path,
-#'   \dQuote{last}: return last optimal element in path, 
+#'   \dQuote{last}: return last optimal element in path,
 #'   \dQuote{random}: return random optimal element in path.
 #'   Default is \dQuote{last}.
 #' @return [\code{integer}]
@@ -172,11 +182,11 @@ getOptPathBestIndex = function(op, y.name=op$y.names[1], dob=op$env$dob, eol=op$
     stop("No element found which matches dob and eol restrictions!")
   y = getOptPathY(op, y.name)[life.inds]
   if (all(is.na(y))) {
-    best.inds = life.inds  
-  } else { 
+    best.inds = life.inds
+  } else {
     if (op$minimize[y.name])
       best.inds = which(min(y, na.rm=TRUE) == y)
-    else 
+    else
       best.inds = which(max(y, na.rm=TRUE) == y)
     best.inds = life.inds[best.inds]
   }
@@ -191,7 +201,7 @@ getOptPathBestIndex = function(op, y.name=op$y.names[1], dob=op$env$dob, eol=op$
       return(best.inds[sample(length(best.inds), 1)])
   } else {
     return(best.inds)
-  }  
+  }
 }
 
 #' Get y vector from the optimization path.
@@ -206,14 +216,34 @@ getOptPathY = function(op, name) {
   UseMethod("getOptPathY")
 }
 
+#' Get date-of-birth vector from the optimization path.
+#'
+#' @param op [\code{\link{OptPath}}]\cr
+#'   Optimization path.
+#' @return [\code{integer}].
+#' @export
+getOptPathDOB = function(op) {
+  UseMethod("getOptPathDOB")
+}
+
+#' Get end-of-life vector from the optimization path.
+#'
+#' @param op [\code{\link{OptPath}}]\cr
+#'   Optimization path.
+#' @return [\code{integer}].
+#' @export
+getOptPathEOL = function(op) {
+  UseMethod("getOptPathEOL")
+}
+
 #' Set the dates of birth of parameter values, in-place.
 #'
-#' @param op [\code{\link{OptPath}}]\cr 
-#'   Optimization path.  
-#' @param index [\code{integer}]\cr 
+#' @param op [\code{\link{OptPath}}]\cr
+#'   Optimization path.
+#' @param index [\code{integer}]\cr
 #'   Vector of indices of elements.
-#' @param dob [integer] \cr 
-#'   Dates of birth, single value or same length of \code{index}. 
+#' @param dob [integer] \cr
+#'   Dates of birth, single value or same length of \code{index}.
 #' @return Nothing.
 #' @export
 setOptPathElDOB = function(op, index, dob) {
@@ -224,17 +254,17 @@ setOptPathElDOB = function(op, index, dob) {
   checkArg(dob, "integer")
   op$env$dob[index] = dob
   invisible(NULL)
-} 
+}
 
 
 #' Set the end of life dates of parameter values, in-place.
 #'
-#' @param op [\code{\link{OptPath}}]\cr 
-#'   Optimization path.  
-#' @param index [\code{integer}]\cr 
+#' @param op [\code{\link{OptPath}}]\cr
+#'   Optimization path.
+#' @param index [\code{integer}]\cr
 #'   Vector of indices of elements.
-#' @param eol [integer] \cr 
-#'   EOL dates, single value or same length of \code{index}. 
+#' @param eol [integer] \cr
+#'   EOL dates, single value or same length of \code{index}.
 #' @return Nothing.
 #' @export
 setOptPathElEOL = function(op, index, eol) {
@@ -245,5 +275,5 @@ setOptPathElEOL = function(op, index, eol) {
   checkArg(eol, "integer")
   op$env$eol[index] = eol
   invisible(NULL)
-} 
+}
 

@@ -25,7 +25,7 @@ trafoValue(p, 2)
 # for a parameter set different transformation functions are possible:
 ps <- makeParamSet(
   makeIntegerParam("u", trafo=function(x) 2*x),
-  makeNumericVectorParam("v", length=2, trafo=function(x) x/sum(x)),
+  makeNumericVectorParam("v", len=2, trafo=function(x) x/sum(x)),
   makeDiscreteParam("w", values=c("a", "b"))
 )
 # now the values of "u" and "v" are transformed:

@@ -1,4 +1,6 @@
 #' Sample a random value from a parameter or a parameter set uniformly.
+#'
+#' Dependent parameters whose requirements are not satisfied are represented by a scalar NA in the output.
 #' 
 #' @param par [\code{\link{Param}} | \code{\link{ParamSet}}]\cr
 #'   Parameter or parameter set.
@@ -18,7 +20,7 @@
 #' # can be either "a", "b" or "c"
 #' sampleValue(p)
 #' 
-#' p <- makeIntegerVectorParam("x", length=2, lower=1, upper=5)
+#' p <- makeIntegerVectorParam("x", len=2, lower=1, upper=5)
 #' # vector of two random integers between 1 and 5:
 #' sampleValue(p) 
 #' 
@@ -38,24 +40,27 @@ sampleValue.Param = function(par, discrete.names=FALSE) {
   if (par$type %in% c("numeric", "numericvector", "integer", "integervector"))
     if (any(is.infinite(c(par$lower, par$upper))))
       stop("Cannot sample with Inf bounds!")
-  if (!is.null(par$length) && is.na(par$length))
+  if (!is.null(par$len) && is.na(par$len))
     stop("Cannot sample with NA length!")
   if (type == "numeric") {
     runif(1, min=par$lower, max=par$upper)
   } else if (type == "numericvector") {
-    runif(par$length, min=par$lower, max=par$upper)
+    runif(par$len, min=par$lower, max=par$upper)
   } else if (type == "integer") {
     as.integer(round(runif(1, min=par$lower-0.5, max=par$upper+0.5)))
   } else if (type == "integervector") {
-    as.integer(round(runif(par$length, min=par$lower-0.5, max=par$upper+0.5)))
-  } else if (type %in% c("discrete", "discretevector", "logical")) {
-    x = sample(names(par$values), par$length, replace=TRUE) 
+    as.integer(round(runif(par$len, min=par$lower-0.5, max=par$upper+0.5)))
+  } else if (type %in% c("discrete", "discretevector", "logical", "logicalvector")) {
+    x = sample(names(par$values), par$len, replace=TRUE) 
     if (!discrete.names) {
-      if (type == "discretevector")
+      x = if (type  == "discretevector")
         par$values[x]
+      else if (type  == "logicalvector")
+        as.logical(x)
       else
         par$values[[x]]
     }
+    return(x)
   } else if (type == "function") {
     stop("Cannot generate random value for function variable!")
   } else if (type == "untyped") {
@@ -65,11 +70,27 @@ sampleValue.Param = function(par, discrete.names=FALSE) {
 
 #' @S3method sampleValue ParamSet
 sampleValue.ParamSet = function(par, discrete.names=FALSE) {
-  lapply(par$pars, sampleValue, discrete.names=discrete.names)
+  val = lapply(par$pars, sampleValue, discrete.names=discrete.names)
+  setNames(lapply(seq_along(val), function(i) {
+    if (!is.null(par$pars[[i]]$requires) && !requiresOk(par, val, i)) {
+      type = par$pars[[i]]$type
+      type = switch(type,
+        numericvector = "numeric",
+        integervector = "integer",
+        logicalvector = "logical",
+        type
+      )
+      as(NA, type)
+     } else {
+      val[[i]]
+     }
+  }), names(par$pars))
 }
 
 
 #' Sample n random values from a parameter or a parameter set uniformly.
+#' 
+#' Dependent parameters whose requirements are not satisfied are represented by a scalar NA in the output.
 #'
 #' @param par [\code{\link{Param}} | \code{\link{ParamSet}}]\cr
 #'   Parameter or parameter set.
@@ -100,6 +121,6 @@ sampleValues = function(par, n, discrete.names=FALSE) {
   checkArg(par, c("Param", "ParamSet"))
   n = convertInteger(n)
   checkArg(n, "integer", 1, na.ok=FALSE)
-  replicate(n, sampleValue(par), simplify=FALSE)
+  replicate(n, sampleValue(par, discrete.names = discrete.names), simplify=FALSE)
 }
 

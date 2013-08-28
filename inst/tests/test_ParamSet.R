@@ -17,7 +17,7 @@ test_that("mixed paramset", {
     makeIntegerParam("v", lower=1, upper=2),
     makeDiscreteParam("w", values=1:2),
     makeLogicalParam("x"),
-    makeDiscreteVectorParam("y", length=2, values=c("a", "b"))
+    makeDiscreteVectorParam("y", len=2, values=c("a", "b"))
   )
   expect_equal(getParamIds(ps), c("u", "v", "w", "x", "y"))
   expect_equal(getParamLengths(ps), c(u=1L, v=1L, w=1L, x=1L, y=2L))
@@ -55,7 +55,7 @@ test_that("cannot build param set from wrong stuff", {
 test_that("paramset with vector", {
   ps = makeParamSet(
     makeNumericParam("x", lower=1),
-    makeIntegerVectorParam("y", length=2, lower=3L, upper=9L)
+    makeIntegerVectorParam("y", len=2, lower=3L, upper=9L)
   )
   expect_equal(getParamIds(ps), c("x", "y"))
   expect_equal(getParamLengths(ps), c(x=1L, y=2L))
@@ -80,7 +80,7 @@ test_that("list works", {
 test_that("combination with c works", {
   ps1 = makeParamSet(
     makeNumericParam("u", lower=1),
-    makeIntegerVectorParam("v", length=2, lower=3L, upper=9L)
+    makeIntegerVectorParam("v", len=2, lower=3L, upper=9L)
   )
   ps2 = makeParamSet(
     makeDiscreteParam("w", values=1:2),
@@ -106,7 +106,7 @@ test_that("cannot combine with overlapping names", {
 test_that("unknown length works", {
   ps = makeParamSet(
     makeNumericLearnerParam("u", lower=2),
-    makeNumericVectorLearnerParam("v", length=NA, lower=1)
+    makeNumericVectorLearnerParam("v", len=NA, lower=1)
   )
   expect_equal(getParamLengths(ps), c(u=1, v=NA))
   expect_true(isFeasible(ps, list(3, c(2))))
@@ -115,3 +115,34 @@ test_that("unknown length works", {
   expect_error(sampleValue(ps), "Cannot sample")
 })
 
+
+test_that("makeNumericParamset", {
+  ps = makeNumericParamSet(lower=10, len=2, vector=TRUE)
+  expect_equal(getParamIds(ps), "x")
+  expect_equal(getParamLengths(ps), c(x=2))
+  expect_equal(getLower(ps), c(x=10, x=10))
+  expect_equal(getUpper(ps), c(x=Inf, x=Inf))
+  ps = makeNumericParamSet(id="y", upper=3, len=2, vector=FALSE)
+  expect_equal(getParamIds(ps), c("y1", "y2"))
+  expect_equal(getParamLengths(ps), c(y1=1, y2=1))
+  expect_equal(getLower(ps), c(y1=-Inf, y2=-Inf))
+  expect_equal(getUpper(ps), c(y1=3, y2=3))
+	ps = makeNumericParamSet(lower=c(1,2), vector=TRUE)
+  expect_equal(getLower(ps), c(x=1, x=2))
+  ps = makeNumericParamSet(lower=c(1,4), upper=c(2,7), vector=FALSE)
+  expect_equal(getLower(ps), c(x1=1, x2=4))
+  expect_equal(getUpper(ps), c(x1=2, x2=7))
+})
+
+test_that("requires works", {
+  ps = makeParamSet(
+    makeDiscreteParam("x", values=c("a", "b")),
+    makeNumericParam("y", requires=quote(x == "a")),
+    makeIntegerVectorParam("z", len=2, requires=quote(x == "b"))
+  )
+  expect_true(isFeasible(ps, list(x="a", y=1,  z=NA)))
+  expect_false(isFeasible(ps, list(x="a", y=NA, z=1)))
+  expect_false(isFeasible(ps, list(x="a", y=NA, z=c(NA, NA))))
+  expect_false(isFeasible(ps, list(x="b", y=1, z=c(2,2))))
+  expect_true(isFeasible(ps, list(x="b", y=NA, z=c(2,2))))
+})

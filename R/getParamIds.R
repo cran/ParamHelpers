@@ -15,15 +15,15 @@
 #' @examples
 #' ps <- makeParamSet(
 #'   makeNumericParam("u"),
-#'   makeIntegerVectorParam("v", length=2)
+#'   makeIntegerVectorParam("v", len=2)
 #' )
 #' getParamIds(ps)
 #' getParamIds(ps, repeated=TRUE)
 #' getParamIds(ps, repeated=TRUE, with.nr=TRUE)
 getParamIds = function(par.set, repeated=FALSE, with.nr=FALSE) {
   ns = lapply(par.set$pars, function(x) {
-    if (repeated && x$type %in% c("numericvector", "integervector", "discretevector")) {
-      n = x$length
+    if (repeated && x$type %in% c("numericvector", "integervector", "discretevector", "logicalvector")) {
+      n = x$len
       if (n > 1 && with.nr)
         paste(rep(x$id, n), 1:n, sep="")
       else

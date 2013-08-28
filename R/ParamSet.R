@@ -1,4 +1,6 @@
-#' Construct a parameter set from a bunch of parameters. 
+#' Construct a parameter set.
+#' 
+#' \code{makeParamSet}: Contruct from a bunch of parameters.
 #' 
 #' Multiple sets can be concatenated with \code{c}.
 #' 
@@ -8,7 +10,7 @@
 #' @param ... [\code{\link{Param}}]\cr
 #'   Parameters.
 #' @param params [list of \code{\link{Param}}]\cr
-#'   List of parameters, alternative ways instead of using \code{...}.
+#'   List of parameters, alternative way instead of using \code{...}.
 #' @return [\code{\link{ParamSet}}].
 #' @aliases ParamSet
 #' @export 
@@ -18,7 +20,7 @@
 #'   makeIntegerParam("v", lower=1, upper=2),
 #'   makeDiscreteParam("w", values=1:2),
 #'   makeLogicalParam("x"),
-#'   makeDiscreteVectorParam("y", length=2, values=c("a", "b"))
+#'   makeDiscreteVectorParam("y", len=2, values=c("a", "b"))
 #' )
 makeParamSet = function(..., params) {
   pars = list(...)
@@ -52,4 +54,48 @@ c.ParamSet = function(..., recursive=FALSE) {
   pss = list(...)
   pars = Reduce(c, lapply(pss, function(ps) ps$pars))
   do.call(makeParamSet, pars)
+}
+
+#' \code{makeNumericParamSet}: Convenience function for numerics.
+#'
+#' @param id [\code{character(1)}]
+#'   Name of parameter.
+#' @param len [\code{integer(1)}]\cr
+#'   Length of vector.
+#' @param lower [\code{numeric}]\cr
+#'   Lower bound. 
+#'   Default is \code{-Inf}.
+#' @param upper [\code{numeric}] \cr
+#'   Upper bound. 
+#'   Default is \code{Inf}.
+#' @param vector [\code{logical(1)}] \cr
+#'   Should a \code{NumericVectorParam} be used instead of 
+#'   n \code{NumericParam} objects?
+#'   Default is \code{TRUE}.
+#' @rdname makeParamSet
+#' @export 
+makeNumericParamSet = function(id="x", len, lower=-Inf, upper=Inf, vector=TRUE) {
+	checkArg(id, "character", len=1L, na.ok=FALSE)
+  if (missing(len)) {
+    if (!missing(lower))
+      len = length(lower)
+    else if (!missing(upper))
+      len = length(upper)
+  } else {
+		len = convertInteger(len)
+		checkArg(len, "integer", len=1L, na.ok=FALSE)
+	}
+  if (is.numeric(lower) && length(lower) == 1)
+    lower = rep(lower, len)
+  if (is.numeric(upper) && length(upper) == 1)
+    upper = rep(upper, len)
+	checkArg(lower, "numeric", len=len, na.ok=FALSE)
+	checkArg(upper, "numeric", len=len, na.ok=FALSE)
+	checkArg(vector, "logical", len=1L, na.ok=FALSE)
+  if (vector) {
+    makeParamSet(makeNumericVectorParam(id=id, len=len, lower=lower, upper=upper))
+  } else {
+    makeParamSet(params=lapply(1:len, function(i)
+      makeNumericParam(id=paste(id, i, sep=""), lower=lower[i], upper=upper[i])))
+  } 
 }

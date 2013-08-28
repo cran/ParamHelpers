@@ -1,25 +1,25 @@
 #' @rdname LearnerParam
 #' @export 
 makeNumericLearnerParam = function(id, lower=-Inf, upper=Inf, default, 
-  pass.default=FALSE, when="train", requires=expression()) {
+  when="train", requires=NULL) {
   
-  p = makeNumericParam(id, lower, upper)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+  p = makeNumericParam(id, lower, upper, requires=requires)
+  learnerParamFromParam(p, default, when)
 }
 
 #' @rdname LearnerParam
 #' @export 
-makeNumericVectorLearnerParam = function(id, length=as.integer(NA), lower=-Inf, 
-  upper=Inf, default, pass.default=FALSE, when="train", requires=expression()) {
+makeNumericVectorLearnerParam = function(id, len=as.integer(NA), lower=-Inf, 
+  upper=Inf, default, when="train", requires=NULL) {
   
-  length = convertInteger(length)
-  checkArg(length, "integer", len=1, na.ok=TRUE)
-  if (is.na(length))
-    p = makeNumericVectorParam(id, length=1, lower=lower, upper=upper)
+  len = convertInteger(len)
+  checkArg(len, "integer", len=1, na.ok=TRUE)
+  if (is.na(len))
+    p = makeNumericVectorParam(id, len=1, lower=lower, upper=upper, requires=requires)
   else  
-    p = makeNumericVectorParam(id, length=length, lower=lower, upper=upper)
-  p = learnerParamFromParam(p, default, pass.default, when, requires)
-  p$length = length
+    p = makeNumericVectorParam(id, len=len, lower=lower, upper=upper, requires=requires)
+  p = learnerParamFromParam(p, default, when)
+  p$len = len
   return(p)
 }
 
@@ -27,85 +27,98 @@ makeNumericVectorLearnerParam = function(id, length=as.integer(NA), lower=-Inf,
 #' @rdname LearnerParam
 #' @export 
 makeIntegerLearnerParam = function(id, lower=-Inf, upper=Inf,
-  default, pass.default=FALSE, when="train", requires=expression()) {
+  default, when="train", requires=NULL) {
   
-  p = makeIntegerParam(id, lower, upper)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+  p = makeIntegerParam(id, lower, upper, requires=requires)
+  learnerParamFromParam(p, default, when)
 }
 
 #' @rdname LearnerParam
 #' @export 
-makeIntegerVectorLearnerParam = function(id, length=as.integer(NA), lower=-Inf, 
-  upper=Inf, default, pass.default=FALSE, when="train", requires=expression()) {
+makeIntegerVectorLearnerParam = function(id, len=as.integer(NA), lower=-Inf, 
+  upper=Inf, default, when="train", requires=NULL) {
   
-  length = convertInteger(length)
-  checkArg(length, "integer", len=1, na.ok=TRUE)
-  if (is.na(length))
-    p = makeIntegerVectorParam(id, length=1, lower=lower, upper=upper)
+  len = convertInteger(len)
+  checkArg(len, "integer", len=1, na.ok=TRUE)
+  if (is.na(len))
+    p = makeIntegerVectorParam(id, len=1, lower=lower, upper=upper, requires=requires)
   else  
-    p = makeIntegerVectorParam(id, length=length, lower=lower, upper=upper)
-  p = learnerParamFromParam(p, default, pass.default, when, requires)
-  p$length = length
+    p = makeIntegerVectorParam(id, len=len, lower=lower, upper=upper, requires=requires)
+  p = learnerParamFromParam(p, default, when)
+  p$len = len
   return(p)
 }
 
 #' @rdname LearnerParam
 #' @export 
-makeDiscreteLearnerParam = function(id, values, default, pass.default=FALSE, 
-  when="train", requires=expression()) {
+makeDiscreteLearnerParam = function(id, values, default,  
+  when="train", requires=NULL) {
   
-  p = makeDiscreteParam(id, values)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+  p = makeDiscreteParam(id, values, requires=requires)
+  learnerParamFromParam(p, default, when)
 }
 
 #' @rdname LearnerParam
 #' @export 
-makeDiscreteVectorLearnerParam = function(id, length=as.integer(NA), values, default, pass.default=FALSE, 
-  when="train", requires=expression()) {
+makeDiscreteVectorLearnerParam = function(id, len=as.integer(NA), values, default,  
+  when="train", requires=NULL) {
   
-  length = convertInteger(length)
-  checkArg(length, "integer", len=1, na.ok=TRUE)
-  if (is.na(length))
-    p = makeDiscreteVectorParam(id, length=1, values=values)
+  len = convertInteger(len)
+  checkArg(len, "integer", len=1, na.ok=TRUE)
+  if (is.na(len))
+    p = makeDiscreteVectorParam(id, len=1, values=values, requires=requires)
   else  
-    p = makeDiscreteVectorParam(id, length=length, values=values)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+    p = makeDiscreteVectorParam(id, len=len, values=values, requires=requires)
+  p = learnerParamFromParam(p, default, when)
+  p$len = len
+  return(p)
 }
-
 
 #' @rdname LearnerParam
 #' @export 
-makeLogicalLearnerParam = function(id, default, pass.default=FALSE, when="train",
-  requires=expression()) {
+makeLogicalLearnerParam = function(id, default, when="train",
+  requires=NULL) {
   
-  p = makeLogicalParam(id)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+  p = makeLogicalParam(id, requires=requires)
+  learnerParamFromParam(p, default, when)
 }
-
 
 #' @rdname LearnerParam
 #' @export 
-makeUntypedLearnerParam = function(id, default, pass.default=FALSE, when="train", requires=expression()) {
-  p = makeUntypedParam(id)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+makeLogicalVectorLearnerParam = function(id, len=as.integer(NA), default, when="train",
+  requires=NULL) {
+  
+  len = convertInteger(len)
+  checkArg(len, "integer", len=1, na.ok=TRUE)
+  if (is.na(len))
+    p = makeLogicalVectorParam(id, len=1, requires=requires)
+  else  
+    p = makeLogicalVectorParam(id, len=len, requires=requires)
+  p = learnerParamFromParam(p, default, when)
+  p$len = len
+  return(p)
 }
-
 
 #' @rdname LearnerParam
 #' @export 
-makeFunctionLearnerParam = function(id, default, pass.default=FALSE, when="train", requires=expression()) {
-  p = makeFunctionParam(id)
-  learnerParamFromParam(p, default, pass.default, when, requires)
+makeUntypedLearnerParam = function(id, default, when="train", requires=NULL) {
+  p = makeUntypedParam(id, requires=requires)
+  learnerParamFromParam(p, default, when)
 }
 
-learnerParamFromParam = function(p, default, pass.default, when, requires) {
-  checkArg(pass.default, "logical", len=1, na.ok=FALSE)
+#' @rdname LearnerParam
+#' @export 
+makeFunctionLearnerParam = function(id, default, when="train", requires=NULL) {
+  p = makeFunctionParam(id, requires=requires)
+  learnerParamFromParam(p, default, when)
+}
+
+learnerParamFromParam = function(p, default, when) {
   checkArg(when, choices=c("train", "predict", "both"))
-  checkArg(requires, "expression")
   if (!missing(default) && !isFeasible(p, default))
     stop(p$id, " : 'default' must be missing or a feasible parameter setting.")  
   has.default = !missing(default)
   if (missing(default))
     default = NULL
-  makeLearnerParam(p, has.default, default, pass.default, when, requires)
+  makeLearnerParam(p, has.default, default, when)
 }

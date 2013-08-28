@@ -8,8 +8,8 @@
 \arguments{
   \item{op}{[\code{\link{OptPath}}]\cr Optimization path.}
 
-  \item{y.name}{[\code{character(1)}] Name of target value
-  to decide which element is best.  Default is
+  \item{y.name}{[\code{character(1)}]\cr Name of target
+  value to decide which element is best.  Default is
   \code{y.names[1]}.}
 
   \item{dob}{[\code{integer}]\cr Possible dates of birth to
