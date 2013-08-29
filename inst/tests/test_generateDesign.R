@@ -44,7 +44,7 @@ test_that("simple num/int/discrete/log design", {
     makeDiscreteParam("x3", values=c("a", "b", "c")),
     makeLogicalParam("x4") 
   )
-  des = generateDesign(500, ps3, discrete.as.factors=FALSE)
+  des = generateDesign(500, ps3, discretes.as.factor=FALSE)
   expect_equal(nrow(des), 500)
   expect_equal(ncol(des), 4)
   expect_true(is.numeric(des[,1]))
@@ -59,7 +59,7 @@ test_that("simple num/int/discrete/log design", {
   tab = as.numeric(table(des[,4]))
   expect_true(all(tab > 200 & tab < 300))
   
-  des = generateDesign(13, ps3, discrete.as.factors=TRUE)
+  des = generateDesign(13, ps3, discretes.as.factor=TRUE)
   expect_equal(nrow(des), 13)
   expect_equal(ncol(des), 4)
   expect_true(is.numeric(des[,1]))
@@ -73,14 +73,15 @@ test_that("simple num/int/discrete/log design", {
   
 test_that("num/int/disc vec design", {
   ps4 = makeParamSet(
-    makeNumericVectorParam("x", length=2, lower=-2, upper=1), 
-    makeIntegerVectorParam("y", length=3, lower=10L, upper=20L),
-    makeDiscreteVectorParam("z", length=2, values=list(a="a", b=list())) 
+    makeNumericVectorParam("x", len=2, lower=-2, upper=1), 
+    makeIntegerVectorParam("y", len=3, lower=10L, upper=20L),
+    makeDiscreteVectorParam("z", len=2, values=list(a="a", b=list())),
+    makeLogicalVectorParam("a", len=2) 
   )
   des = generateDesign(13, ps4)
   expect_equal(nrow(des), 13)
-  expect_equal(ncol(des), 7)
-  expect_equal(colnames(des), c("x1", "x2", "y1", "y2", "y3", "z1", "z2"))
+  expect_equal(ncol(des), 9)
+  expect_equal(colnames(des), c("x1", "x2", "y1", "y2", "y3", "z1", "z2", "a1", "a2"))
   expect_true(is.numeric(des[,1]))
   expect_true(is.numeric(des[,2]))
   expect_true(is.integer(des[,3]))
@@ -88,6 +89,8 @@ test_that("num/int/disc vec design", {
   expect_true(is.integer(des[,5]))
   expect_true(is.factor(des[,6]))
   expect_true(is.factor(des[,7]))
+  expect_true(is.logical(des[,8]))
+  expect_true(is.logical(des[,9]))
   expect_true(des[,1] >= -2 && des[,1] <= 1)
   expect_true(des[,2] >= -2 && des[,2] <= 1)
   expect_true(des[,3] >= 10 && des[,3] <= 20)
@@ -99,8 +102,8 @@ test_that("num/int/disc vec design", {
 
 test_that("num/int vec design with trafo", {
   ps5 = makeParamSet(
-    makeNumericVectorParam("x", length=2, lower=-2, upper=1, trafo =  function(x) 2^x), 
-    makeIntegerVectorParam("y", length=3, lower=10L, upper=20L, trafo=function(x) 3L*x) 
+    makeNumericVectorParam("x", len=2, lower=-2, upper=1, trafo =  function(x) 2^x), 
+    makeIntegerVectorParam("y", len=3, lower=10L, upper=20L, trafo=function(x) 3L*x) 
   )
   des = generateDesign(100, ps5, trafo=TRUE)
   expect_equal(nrow(des), 100)
@@ -118,9 +121,9 @@ test_that("num/int vec design with trafo", {
   expect_true(des[,5] >= 30 && des[,5] <= 60)
   
   ps6 = makeParamSet(
-    makeNumericVectorParam("x", length=2, lower=0, upper=1, trafo = function(x) x / sum(x)), 
-    makeIntegerVectorParam("y", length=2, lower=10L, upper=20L, trafo=function(x) 1:2),
-    makeDiscreteVectorParam("z", length=2, values=c("a", "b")) 
+    makeNumericVectorParam("x", len=2, lower=0, upper=1, trafo = function(x) x / sum(x)), 
+    makeIntegerVectorParam("y", len=2, lower=10L, upper=20L, trafo=function(x) 1:2),
+    makeDiscreteVectorParam("z", len=2, values=c("a", "b")) 
   )
   des = generateDesign(5, ps6, trafo=TRUE)
   expect_equal(nrow(des), 5)
@@ -134,3 +137,23 @@ test_that("num/int vec design with trafo", {
   expect_equal(des[,3], rep(1, 5))
   expect_equal(des[,4], rep(2, 5))
 })
+
+test_that("requires works", {
+  ps = makeParamSet(
+    makeDiscreteParam("x", values = c("a", "b")),
+    makeNumericParam("y", lower=1, upper=2, requires = quote(x == "a"))
+  )
+  des = generateDesign(50, par.set=ps)
+  vals = dfRowsToList(des, ps)
+  oks = sapply(vals, isFeasible, par=ps)
+  expect_true(all(oks))
+  ps = makeParamSet(
+    makeDiscreteParam("x", values = c("a", "b")),
+    makeNumericVectorParam("y", len=2, lower=1, upper=2, requires = quote(x == "a"))
+  )
+  des = generateDesign(50, par.set=ps)
+  vals = dfRowsToList(des, ps)
+  oks = sapply(vals, isFeasible, par=ps)
+  expect_true(all(oks))
+})
+

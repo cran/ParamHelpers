@@ -16,7 +16,9 @@
   or a character vector of names for a discrete vector.
 }
 \description{
-  Convert discrete value(s) to encoding name(s).
+  If the value \code{x} is \code{NA}, indicating a missing
+  parameter value due to unsatisfied requirements,
+  \code{NA} is returned.
 }
 \examples{
 p <- makeDiscreteParam("u", values=c(x1="a", x2="b", x3="c"))

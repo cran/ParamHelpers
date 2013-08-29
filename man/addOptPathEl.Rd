@@ -36,6 +36,10 @@
   path. Otherwise you have to switch off the feasibility
   check, as constraints might now not hold anymore.
 }
+\details{
+  Dependent parameters whose requirements are not satisfied
+  must be represented by a scalar NA in the input.
+}
 \examples{
 ps <- makeParamSet(
   makeNumericParam("p1"),

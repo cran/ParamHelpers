@@ -5,6 +5,7 @@
 \alias{makeIntegerParam}
 \alias{makeIntegerVectorParam}
 \alias{makeLogicalParam}
+\alias{makeLogicalVectorParam}
 \alias{makeNumericParam}
 \alias{makeNumericVectorParam}
 \alias{makeUntypedParam}
@@ -12,76 +13,98 @@
 \title{Create a description object for a parameter.}
 \usage{
   makeNumericParam(id, lower = -Inf, upper = Inf,
-    trafo = identity)
+    trafo = NULL, requires = NULL)
 
-  makeNumericVectorParam(id, length, lower = -Inf,
-    upper = Inf, trafo = identity)
+  makeNumericVectorParam(id, len, lower = -Inf,
+    upper = Inf, trafo = NULL, requires = NULL)
 
   makeIntegerParam(id, lower = -Inf, upper = Inf,
-    trafo = identity)
+    trafo = NULL, requires = NULL)
 
-  makeIntegerVectorParam(id, length, lower = -Inf,
-    upper = Inf, trafo = identity)
+  makeIntegerVectorParam(id, len, lower = -Inf,
+    upper = Inf, trafo = NULL, requires = NULL)
 
-  makeLogicalParam(id)
+  makeLogicalParam(id, requires = NULL)
 
-  makeDiscreteParam(id, values)
+  makeLogicalVectorParam(id, len, requires = NULL)
 
-  makeDiscreteVectorParam(id, length, values)
+  makeDiscreteParam(id, values, requires = NULL)
 
-  makeFunctionParam(id)
+  makeDiscreteVectorParam(id, len, values, requires = NULL)
 
-  makeUntypedParam(id)
+  makeFunctionParam(id, requires = NULL)
+
+  makeUntypedParam(id, requires = NULL)
 }
 \arguments{
-  \item{id}{[\code{character(1)}] Name of parameter.}
+  \item{id}{[\code{character(1)}]\cr Name of parameter.}
 
-  \item{length}{[\code{integer(1)}]\cr Length of vector.}
+  \item{len}{[\code{integer(1)}]\cr Length of vector
+  parameter.}
 
-  \item{lower}{[\code{numeric}]\cr Lower bound.  Default is
+  \item{lower}{[\code{numeric}]\cr Lower bounds.  A singe
+  value of length 1 is automatically replicated to
+  \code{len} for vector parameters.  Default is
   \code{-Inf}.}
 
-  \item{upper}{[\code{numeric}] \cr Upper bound.  Default
-  is \code{Inf}.}
+  \item{upper}{[\code{numeric}]\cr Upper bounds.  A singe
+  value of length 1 is automatically replicated to
+  \code{len} for vector parameters.  Default is
+  \code{Inf}.}
 
   \item{values}{[\code{vector} | \code{list}]\cr Possible
-  discrete values. You are allowed to pass a list of
-  complex R values, which are used as discrete choices. If
-  you do the latter, the elements must be uniquely named,
-  so that the names can be used as internal represenatation
-  for the choice.}
+  discrete values. Instead of using a vector of atomic
+  values, you are also allowed to pass a list of quite
+  \dQuote{complex} R objects, which are used as discrete
+  choices. If you do the latter, the elements must be
+  uniquely named, so that the names can be used as internal
+  represenatations for the choice.}
 
-  \item{trafo}{[\code{function(x)}] \cr Function to
-  transform parameter. Is should be applied to the
-  parameter value before it is e.g. passed to a
-  corresponding fitness function.  Function must accept a
+  \item{trafo}{[\code{NULL} | \code{function(x)}]\cr
+  Function to transform parameter. It should be applied to
+  the parameter value before it is, e.g., passed to a
+  corresponding objective function.  Function must accept a
   parameter value as the first argument and return a
-  transformed one.  Default is \code{\link{identity}}.}
+  transformed one.  Default is \code{NULL} which means no
+  transformation.}
+
+  \item{requires}{[\code{NULL} | R expression]\cr States
+  requirements on other paramaters' values, so that setting
+  this parameter only makes sense if its requirements are
+  satisfied (dependent parameter).  Only really useful if
+  the parameter is included in a \code{\link{ParamSet}}.
+  Default is \code{NULL} which means no requirements.}
 }
 \value{
   [\code{\link{Param}}].
 }
 \description{
+  For each parameter type a special constructor function is
+  available, see below.
+}
+\details{
   The S3 class is a list which stores these elements:
   \describe{ \item{id [\code{character(1)}]}{See argument
   of same name.} \item{type [\code{character(1)}]}{Data
   type of parameter. Possible types are \dQuote{numeric},
   \dQuote{numericvector}, \dQuote{integer},
-  \dQuote{integervector}, \dQuote{discrete},
-  \dQuote{function}, \dQuote{untyped}.} \item{length
-  [\code{integer(1)}]}{See argument of same name.}
-  \item{lower [\code{numeric}]}{See argument of same name.}
-  \item{upper [\code{numeric}]}{See argument of same name.}
-  \item{values [\code{list}}{Discrete values, always stored
-  as a named list.} \item{trafo [\code{function(x)}]}{See
+  \dQuote{integervector}, \dQuote{logical},
+  \dQuote{logicalvector}, \dQuote{discrete},
+  \dQuote{discretevector}, \dQuote{function},
+  \dQuote{untyped}.} \item{len [\code{integer(1)}]}{See
+  argument of same name.} \item{lower [\code{numeric}]}{See
+  argument of same name. Length of this vector is
+  \code{len}.} \item{upper [\code{numeric}]}{See argument
+  of same name. Length of this vector is \code{len}.}
+  \item{values [\code{list}]}{Discrete values, always
+  stored as a named list.} \item{trafo [\code{NULL} |
+  \code{function(x)}]}{See argument of same name.}
+  \item{requires [\code{NULL} | \code{expression}]}{See
   argument of same name.} }
-}
-\details{
-  Create a description object for a parameter.
 }
 \examples{
 makeNumericParam("x",lower=-1, upper=1)
-makeNumericVectorParam("x", length=2)
+makeNumericVectorParam("x", len=2)
 makeDiscreteParam("y", values=c("a","b"))
 }
 

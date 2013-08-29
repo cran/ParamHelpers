@@ -15,7 +15,7 @@
 #' # for a parameter set different transformation functions are possible:
 #' ps <- makeParamSet(
 #'   makeIntegerParam("u", trafo=function(x) 2*x),
-#'   makeNumericVectorParam("v", length=2, trafo=function(x) x/sum(x)),
+#'   makeNumericVectorParam("v", len=2, trafo=function(x) x/sum(x)),
 #'   makeDiscreteParam("w", values=c("a", "b"))
 #' )
 #' # now the values of "u" and "v" are transformed: 
@@ -24,7 +24,10 @@ trafoValue = function(par, x) {
   if (is(par, "ParamSet"))
     Map(trafoValue, par$pars, x)
   else
-    par$trafo(x)
+    if(is.null(par$trafo))
+      x
+    else
+      par$trafo(x)
 }
 
 #' Transform optimization path.
@@ -39,7 +42,7 @@ trafoValue = function(par, x) {
 #' @examples
 #' ps <- makeParamSet(
 #'   makeIntegerParam("u", trafo=function(x) 2*x),
-#'   makeNumericVectorParam("v", length=2, trafo=function(x) x/sum(x)),
+#'   makeNumericVectorParam("v", len=2, trafo=function(x) x/sum(x)),
 #'   makeDiscreteParam("w", values=c("a", "b"))
 #' )
 #' op <- makeOptPathDF(ps, y.names="y", minimize=TRUE)

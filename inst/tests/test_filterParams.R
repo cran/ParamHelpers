@@ -20,12 +20,14 @@ test_that("filter mixed paramset", {
     makeIntegerParam("v", lower=1, upper=2),
     makeDiscreteParam("w", values=1:2),
     makeLogicalParam("x"),
-    makeDiscreteVectorParam("y", length=2, values=c("a", "b"))
+    makeDiscreteVectorParam("y", len=2, values=c("a", "b")),
+    makeLogicalVectorParam("z", len=3)
   )
   expect_equal(getParamIds(filterParams(ps, "numeric")),"u")
   expect_equal(getParamIds(filterParams(ps, "integer")),"v")
   expect_equal(getParamIds(filterParams(ps, "discrete")),"w")
   expect_equal(getParamIds(filterParams(ps, "logical")),"x")
+  expect_equal(getParamIds(filterParams(ps, c("logical", "logicalvector"))), c("x", "z"))
   expect_equal(getParamIds(filterParams(ps, "discretevector")),"y")
   expect_equal(getParamIds(filterParams(ps, c("numeric","integer"))),c("u","v"))
   expect_equal(getParamIds(filterParams(ps, c("integer","numeric"))),c("u","v"))

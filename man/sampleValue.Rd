@@ -18,8 +18,8 @@
   correct order is returned.
 }
 \description{
-  Sample a random value from a parameter or a parameter set
-  uniformly.
+  Dependent parameters whose requirements are not satisfied
+  are represented by a scalar NA in the output.
 }
 \examples{
 # bounds are necessary here, can't sample with Inf bounds:
@@ -31,7 +31,7 @@ p <- makeDiscreteParam("x", values=c("a","b","c"))
 # can be either "a", "b" or "c"
 sampleValue(p)
 
-p <- makeIntegerVectorParam("x", length=2, lower=1, upper=5)
+p <- makeIntegerVectorParam("x", len=2, lower=1, upper=5)
 # vector of two random integers between 1 and 5:
 sampleValue(p)
 

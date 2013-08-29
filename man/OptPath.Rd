@@ -1,6 +1,7 @@
 \name{makeOptPathDF}
 \alias{makeOptPathDF}
 \alias{OptPath}
+\alias{OptPathDF}
 \title{Create optimization path.}
 \usage{
   makeOptPathDF(par.set, y.names, minimize,
@@ -10,11 +11,12 @@
   \item{par.set}{[\code{\link{ParamSet}}]\cr Parameter set
   for the decision variables that are optimized.}
 
-  \item{y.names}{[\code{logical(1)}]\cr Names of
-  performance measures that are optimized or logged.}
+  \item{y.names}{[\code{character}]\cr Names of performance
+  measures that are optimized or logged.}
 
-  \item{minimize}{[\code{logical(1)}]\cr Which of the
-  performance measures in y.names should be minimized?}
+  \item{minimize}{[\code{logical}]\cr Which of the
+  performance measures in y.names should be minimized?
+  Vector of booleans in the same order as \code{y.names}.}
 
   \item{add.transformed.x}{[\code{logical(1)}]\cr If some
   parameters have associated transformations, are you going
@@ -22,9 +24,10 @@
   Default is \code{FALSE}.}
 }
 \description{
-  Optimizers can log their evaluated points iteratively
+  Optimizers can iteratively log their evaluated points
   into this object. Can be converted into a data.frame with
-  \code{as.data.frame}.
+  \code{as.data.frame(x, discrete.as.factor = TRUE /
+  FALSE)}.
 }
 \details{
   A optimization path has a number of path elements, where
@@ -35,7 +38,7 @@
 
   For discrete parameters always the name of the value is
   stored as a character. When you retrieve an element with
-  \code{\link{getOptPathEl}} this name is converted to the
+  \code{\link{getOptPathEl}}, this name is converted to the
   actual discrete value.
 
   If parameters have associated transformation you are free

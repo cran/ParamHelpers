@@ -11,7 +11,7 @@
 #'   makeNumericParam("u"),
 #'   makeIntegerParam("v", lower=1, upper=2),
 #'   makeDiscreteParam("w", values=1:2),
-#'   makeNumericVectorParam("x", length=2, lower=c(0, 10), upper=c(1, 11))
+#'   makeNumericVectorParam("x", len=2, lower=c(0, 10), upper=c(1, 11))
 #' )
 #' getLower(ps)
 getLower = function(par.set) {
@@ -38,7 +38,7 @@ getLower = function(par.set) {
 #'   makeNumericParam("u"),
 #'   makeIntegerParam("v", lower=1, upper=2),
 #'   makeDiscreteParam("w", values=1:2),
-#'   makeNumericVectorParam("x", length=2, lower=c(0, 10), upper=c(1, 11))
+#'   makeNumericVectorParam("x", len=2, lower=c(0, 10), upper=c(1, 11))
 #' )
 #' getUpper(ps)
 getUpper = function(par.set) {
@@ -68,7 +68,7 @@ getUpper = function(par.set) {
 #' getValues(ps)
 getValues = function(par.set) {
   checkArg(par.set, "ParamSet")
-  par.set = filterParams(par.set, c("discrete", "discretevector", "logical"))
+  par.set = filterParams(par.set, c("discrete", "discretevector", "logical", "logicalvector"))
   if (length(par.set$pars) == 0)
     return(list())
   lapply(par.set$pars, function(p) p$values)

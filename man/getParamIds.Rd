@@ -26,7 +26,7 @@
 \examples{
 ps <- makeParamSet(
   makeNumericParam("u"),
-  makeIntegerVectorParam("v", length=2)
+  makeIntegerVectorParam("v", len=2)
 )
 getParamIds(ps)
 getParamIds(ps, repeated=TRUE)

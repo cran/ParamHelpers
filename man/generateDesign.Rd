@@ -2,13 +2,13 @@
 \alias{generateDesign}
 \title{Generates a statistical design for a parameter set.}
 \usage{
-  generateDesign(n, par.set, fun, fun.args = list(),
+  generateDesign(n = 10L, par.set, fun, fun.args = list(),
     trafo = FALSE, ints.as.num = FALSE,
-    discrete.as.factors = TRUE)
+    discretes.as.factor = TRUE, logicals.as.factor = FALSE)
 }
 \arguments{
   \item{n}{[\code{integer(1)}]\cr Number of samples in
-  design.}
+  design.  Default is 10.}
 
   \item{par.set}{[\code{\link{ParamSet}}]\cr Parameter
   set.}
@@ -34,10 +34,15 @@
   \dQuote{integervector} generate numeric columns?  Default
   is \code{FALSE}.}
 
-  \item{discrete.as.factors}{[\code{logical(1)}]\cr Should
+  \item{discretes.as.factor}{[\code{logical(1)}]\cr Should
   discrete parameters have columns of type \dQuote{factor}
   in result?  Otherwise character columns are generated.
   Default is \code{TRUE}.}
+
+  \item{logicals.as.factor}{[\code{logical(1)}]\cr Should
+  logical parameters have columns of type \dQuote{factor}
+  in result?  Otherwise logical columns are generated.
+  Default is \code{FALSE}.}
 }
 \value{
   The created design is a data.frame. Columns are named by
@@ -48,11 +53,13 @@
   type of a column is defined in the following way. Numeric
   parameters generate numeric columns, integer parameters
   generate numeric/integer columns, logical parameters
-  generate logical columns.  For discrete parameters the
-  value names are used and character or factor columns are
-  generated.  The result will have an \code{logical(1)}
-  attribute \dQuote{trafo}, which is set to the value of
-  argument \code{trafo}.
+  generate logical/factor columns.  For discrete parameters
+  the value names are used and character or factor columns
+  are generated.  Dependent parameters whose constaints are
+  unsatisfied generate \code{NA} entries in their
+  respective columns.  The result will have an
+  \code{logical(1)} attribute \dQuote{trafo}, which is set
+  to the value of argument \code{trafo}.
 }
 \description{
   Currently only lhs designs are supported.
@@ -68,7 +75,7 @@ generateDesign(5, ps)
 # with trafo
 ps <- makeParamSet(
   makeNumericParam("x", lower=-2, upper=1),
-  makeNumericVectorParam("y", length=2, lower=0, upper=1, trafo=function(x) x/sum(x))
+  makeNumericVectorParam("y", len=2, lower=0, upper=1, trafo=function(x) x/sum(x))
 )
 generateDesign(10, ps, trafo=TRUE)
 }
