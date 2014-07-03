@@ -1,20 +1,30 @@
-#' Construct a parameter set.
-#' 
+#' @title Construct a parameter set.
+#'
+#' @description
 #' \code{makeParamSet}: Contruct from a bunch of parameters.
-#' 
+#'
 #' Multiple sets can be concatenated with \code{c}.
-#' 
+#'
 #' The constructed S3 class is simply a list that contains the element \code{pars}.
-#' \code{pars} is a list of the passed parameters, named by their ids. 
+#' \code{pars} is a list of the passed parameters, named by their ids.
 #'
 #' @param ... [\code{\link{Param}}]\cr
 #'   Parameters.
 #' @param params [list of \code{\link{Param}}]\cr
 #'   List of parameters, alternative way instead of using \code{...}.
+#' @param forbidden [\code{NULL} | R expression]\cr
+#'   States forbidden region of parameter set via an expression.
+#'   Every setting which satisfies this expression is considered to be infeasible.
+#'   This makes it possible to exclude more complex region of the parameter space
+#'   than through simple constraints or \code{requires}-conditions
+#'   (although these should be always used when possible).
+#'   If parameters have associated trafos, the forbidden region must always be specified on the original
+#'   scale and not the transformed one.
+#'   Default is \code{NULL} which means no forbidden region.
 #' @return [\code{\link{ParamSet}}].
 #' @aliases ParamSet
-#' @export 
-#' @examples 
+#' @export
+#' @examples
 #' makeParamSet(
 #'   makeNumericParam("u", lower=1),
 #'   makeIntegerParam("v", lower=1, upper=2),
@@ -22,38 +32,61 @@
 #'   makeLogicalParam("x"),
 #'   makeDiscreteVectorParam("y", len=2, values=c("a", "b"))
 #' )
-makeParamSet = function(..., params) {
+makeParamSet = function(..., params, forbidden = NULL) {
   pars = list(...)
   if (length(pars) > 0 && !missing(params))
     stop("You can only use one of ... or params!")
   if (!missing(params)) {
-    checkListElementClass(params, "Param")
+    assertList(params, types = "Param")
     pars = params
   } else {
-    checkListElementClass(pars, "Param")
+    assertList(pars, types = "Param")
   }
   ns = extractSubList(pars, "id")
   if (any(duplicated(ns)))
     stop("All parameters must have unique names!")
   names(pars) = ns
-  x = list(pars=pars)
-  class(x) = "ParamSet"
-  return(x)
+  makeS3Obj("ParamSet", pars = pars, forbidden = forbidden)
 }
 
-#' @S3method print ParamSet
-print.ParamSet = function(x, ...) {
-  if (length(x$pars) == 0)
+getParSetPrintData = function(x, trafo = TRUE, used = TRUE) {
+  d = lapply(x$pars, getParPrintData, trafo = trafo, used = used)
+  do.call(rbind, d)
+}
+
+#' @export
+print.ParamSet = function(x, ..., trafo = TRUE, used = TRUE) {
+  if (isEmpty(x)) {
     print("Empty parameter set.")
-  else  
-    sapply(x$pars, print)
+  } else  {
+    print(getParSetPrintData(x, trafo = trafo, used = used))
+  }
+  if (hasForbidden(x))
+    catf("Forbidden region specified.")
+  invisible(NULL)
 }
 
-#' @S3method c ParamSet
+#' @export
 c.ParamSet = function(..., recursive=FALSE) {
   pss = list(...)
   pars = Reduce(c, lapply(pss, function(ps) ps$pars))
   do.call(makeParamSet, pars)
+}
+
+#' Check whether parameter set is empty.
+#'
+#' @param par.set \code{\link{ParamSet}}]\cr
+#'   Parameter set.
+#' @return [\code{logical(1)}].
+#' @export
+isEmpty = function(par.set) {
+  assertClass(par.set, "ParamSet")
+  UseMethod("isEmpty")
+}
+
+#' @export
+isEmpty.ParamSet = function(par.set) {
+  length(par.set$pars) == 0
 }
 
 #' \code{makeNumericParamSet}: Convenience function for numerics.
@@ -63,39 +96,40 @@ c.ParamSet = function(..., recursive=FALSE) {
 #' @param len [\code{integer(1)}]\cr
 #'   Length of vector.
 #' @param lower [\code{numeric}]\cr
-#'   Lower bound. 
+#'   Lower bound.
 #'   Default is \code{-Inf}.
 #' @param upper [\code{numeric}] \cr
-#'   Upper bound. 
+#'   Upper bound.
 #'   Default is \code{Inf}.
 #' @param vector [\code{logical(1)}] \cr
-#'   Should a \code{NumericVectorParam} be used instead of 
+#'   Should a \code{NumericVectorParam} be used instead of
 #'   n \code{NumericParam} objects?
 #'   Default is \code{TRUE}.
 #' @rdname makeParamSet
-#' @export 
+#' @export
 makeNumericParamSet = function(id="x", len, lower=-Inf, upper=Inf, vector=TRUE) {
-	checkArg(id, "character", len=1L, na.ok=FALSE)
+  assertString(id)
   if (missing(len)) {
     if (!missing(lower))
       len = length(lower)
     else if (!missing(upper))
       len = length(upper)
   } else {
-		len = convertInteger(len)
-		checkArg(len, "integer", len=1L, na.ok=FALSE)
-	}
+    len = asInt(len)
+  }
   if (is.numeric(lower) && length(lower) == 1)
     lower = rep(lower, len)
   if (is.numeric(upper) && length(upper) == 1)
     upper = rep(upper, len)
-	checkArg(lower, "numeric", len=len, na.ok=FALSE)
-	checkArg(upper, "numeric", len=len, na.ok=FALSE)
-	checkArg(vector, "logical", len=1L, na.ok=FALSE)
+    assertNumeric(lower, len = len)
+    assertNumeric(upper, len = len)
+    assertFlag(vector)
   if (vector) {
     makeParamSet(makeNumericVectorParam(id=id, len=len, lower=lower, upper=upper))
   } else {
     makeParamSet(params=lapply(1:len, function(i)
       makeNumericParam(id=paste(id, i, sep=""), lower=lower[i], upper=upper[i])))
-  } 
+  }
 }
+
+

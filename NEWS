@@ -1,17 +1,42 @@
+ParamHelpers_1.2:
+- normal parameters can now have a default value
+- parameter spaces can now define a forbidden region of infeasibility.
+  all operations on the set respect this, although a few are disallowed and produce an exception.
+- rewrote generateDesign and dfRowsToList in C to greatly increase speed in
+  the case of dependent parameters
+- generateDesign and generateGridDesign do not support type conversion anymore. See help page.
+- generateDesign now ensures that no duplicted settings are produced in rarer cases
+- Added option to log error messages, execution time and extra info in the optimization path.
+- slightly change interface of getOptPathY, so one can now return a matrix of multiple measures.
+- paramValueToString produces better readable output
+- sampleValue(s) have new option "trafo"
+- getLower and getUpper have with.nr argument now
+- getTypes renamed to getParamTypes
+- new functions
+-- isNumeric, isDiscrete, isInteger, isLogical
+-- hasNumeric, hasInteger, hasDiscrete, hasLogical
+-- getParamNr
+-- getDefaults
+-- hasTrafo, hasRequires
+-- isForbidden, hasForbidden
+-- generateGridDesign
+-- getOptPathExecTimes, getOptPathErrorMessages
+-- getOptPathParetoFront
+
 ParamHelpers_1.1-35:
 - concept of dependent parameters was introduced (argument "requires")
 - as.data.frame.OptPath: discretes.as.factor option
 - all arguments "length" renamed to len
 - new functions
--- convertParamSetToIrace  
+-- convertParamSetToIrace
 -- dfRowToList, dfRowsToList
 -- getOptPathDOB, getOptPathEOL
 -- hasRequires
--- removeMissingValues	
+-- removeMissingValues
 
 ParamHelpers_1.0-55:
-- disabled one unreasobale unit test for CRAN
-- some dependencies are now imports like they shoud be
+- disabled one unreasonable unit test for CRAN
+- some dependencies are now imports like they should be
 
-ParamHelpers_1.0-54: 
+ParamHelpers_1.0-54:
 - First submit to CRAN.

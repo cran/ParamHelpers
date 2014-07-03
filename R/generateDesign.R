@@ -1,148 +1,182 @@
-#' Generates a statistical design for a parameter set.
+#FIXME: generateDesign will NOT work if there are dependencies
+# over multiple levels of params and one only states the dependency only
+#  wrt to the "last" param. also see daniels unit test.
+#  it works as long all dependencies are stated, we need to at least document this
+
+#FIXME: it really makes no sense to calculate the distance for params that are NA when we do the
+# design and augment it right? think about what happens here
+
+
+#' @title Generates a statistical design for a parameter set.
+#'
+#' @description
+#' The following types of columns are created:
+#' \tabular{ll}{
+#'  numeric(vector)   \tab  \code{numeric}  \cr
+#'  integer(vector)   \tab  \code{integer}  \cr
+#'  discrete(vector)  \tab  \code{factor} (names of values = levels) \cr
+#'  logical(vector)   \tab  \code{logical}
+#' }
+#' If you want to convert these, look at \code{\link[BBmisc]{convertDataFrameCols}}.
+#' Dependent parameters whose constraints are unsatisfied generate \code{NA} entries in their
+#' respective columns.
 #'
 #' Currently only lhs designs are supported.
 #'
-#' @param n [\code{integer(1)}]\cr 
-#'   Number of samples in design.   
+#' The algorithm currently iterates the following steps:
+#' \enumerate{
+#'   \item{We create a space filling design for all parameters, disregarding \code{requires},
+#'     a \code{trafo} or the forbidden region.}
+#'   \item{Forbidden points are removed.}
+#'   \item{Parameters are trafoed (maybe); dependent parameters whose constraints are unsatisfied
+#'     are set to \code{NA} entries.}
+#'   \item{Duplicated design points are removed. Duplicated points are not generated in a
+#'    reasonable space-filling design, but the way discrete parameters and also parameter dependencies
+#'    are handled make this possible.}
+#'   \item{If we removed some points, we now try to augment the design in a space-filling way
+#'     and iterate.}
+#' }
+#'
+#' Note that augmenting currently is somewhat experimental as we simply generate missing points
+#' via new calls to \code{\link[lhs]{randomLHS}}, but do not add points so they are maximally
+#' far away from the already present ones. The reason is that the latter is quite hard to achieve
+#' with complicated dependences and forbidden regions, if one wants to ensure that points actually
+#' get added... But we are working on it,
+#'
+#' @param n [\code{integer(1)}]\cr
+#'   Number of samples in design.
 #'   Default is 10.
 #' @param par.set [\code{\link{ParamSet}}]\cr
 #'   Parameter set.
 #' @param fun [\code{function}]\cr
-#'   Function from package lhs. 
-#'   Possible are: \code{\link[lhs]{maximinLHS}}, \code{\link[lhs]{randomLHS}}, \code{\link[lhs]{geneticLHS}}, \code{\link[lhs]{improvedLHS}}, \code{\link[lhs]{optAugmentLHS}}, \code{\link[lhs]{optimumLHS}} 
+#'   Function from package lhs.
+#'   Possible are: \code{\link[lhs]{maximinLHS}}, \code{\link[lhs]{randomLHS}},
+#'   \code{\link[lhs]{geneticLHS}}, \code{\link[lhs]{improvedLHS}}, \code{\link[lhs]{optAugmentLHS}},
+#'   \code{\link[lhs]{optimumLHS}}
 #'   Default is \code{\link[lhs]{randomLHS}}.
 #' @param fun.args [\code{list}]\cr
-#'   List of further arguments passed to \code{fun}. 
-#' @param trafo [\code{logical(1)}]\cr
-#'   Transform all parameters by using theirs respective transformation functions. 
-#'   Default is \code{FALSE}. 
-#' @param ints.as.num [\code{logical(1)}]\cr
-#'   Should parameters of type \dQuote{integer} or \dQuote{integervector} generate numeric columns?
-#'   Default is \code{FALSE}.  
-#' @param discretes.as.factor [\code{logical(1)}]\cr
-#'   Should discrete parameters have columns of type \dQuote{factor} in result?
-#'   Otherwise character columns are generated.
-#'   Default is \code{TRUE}.  
-#' @param logicals.as.factor [\code{logical(1)}]\cr
-#'   Should logical parameters have columns of type \dQuote{factor} in result?
-#'   Otherwise logical columns are generated.
-#'   Default is \code{FALSE}.  
+#'   List of further arguments passed to \code{fun}.
+#' @template arg_trafo
+#' @param augment [\code{integer(1)}]\cr
+#'   Duplicated values and forbidden regions in the parameter space can lead to the design
+#'   becoming smaller than \code{n}. With this option it is possible to augment the design again
+#'   to size \code{n}. It is not guaranteed that this always works (to full size)
+#'   and \code{augment} specifies the number of tries to augment.
+#'   If the the design is of size less than \code{n} after all tries, a warning is issued
+#'   and the smaller design is returned.
+#'   Default is 20.
 #' @return The created design is a data.frame. Columns are named by the ids of the parameters.
-#'   If the \code{par.set} argument contains a vector parameter, its corresponding column names  
-#'   in the design are the parameter id concatenated with 1 to dimension of the vector.   
-#'   The data type of a column 
-#'   is defined in the following way. Numeric parameters generate numeric columns, integer parameters generate numeric/integer columns, 
-#'   logical parameters generate logical/factor columns.
-#'   For discrete parameters the value names are used and character or factor columns are generated.
-#'   Dependent parameters whose constaints are unsatisfied generate \code{NA} entries in their
-#'   respective columns.
-#'   The result will have an \code{logical(1)} attribute \dQuote{trafo}, 
+#'   If the \code{par.set} argument contains a vector parameter, its corresponding column names
+#'   in the design are the parameter id concatenated with 1 to dimension of the vector.
+#'   The result will have an \code{logical(1)} attribute \dQuote{trafo},
 #'   which is set to the value of argument \code{trafo}.
-#' @export 
+#' @export
+#' @useDynLib ParamHelpers c_generateDesign c_trafo_and_set_dep_to_na
 #' @examples
-#' ps <- makeParamSet(
-#'   makeNumericParam("x1", lower=-2, upper=1), 
-#'   makeIntegerParam("x2", lower=10, upper=20) 
+#' ps = makeParamSet(
+#'   makeNumericParam("x1", lower = -2, upper = 1),
+#'   makeIntegerParam("x2", lower = 10, upper = 20)
 #' )
 #' # random latin hypercube design with 5 samples:
 #' generateDesign(5, ps)
-#' 
-#' # with trafo 
-#' ps <- makeParamSet(
-#'   makeNumericParam("x", lower=-2, upper=1), 
-#'   makeNumericVectorParam("y", len=2, lower=0, upper=1, trafo=function(x) x/sum(x)) 
+#'
+#' # with trafo
+#' ps = makeParamSet(
+#'   makeNumericParam("x", lower = -2, upper = 1),
+#'   makeNumericVectorParam("y", len = 2, lower = 0, upper = 1, trafo = function(x) x/sum(x))
 #' )
-#' generateDesign(10, ps, trafo=TRUE)
-generateDesign = function(n=10L, par.set, fun, fun.args=list(), trafo=FALSE, ints.as.num=FALSE, discretes.as.factor=TRUE, logicals.as.factor=FALSE) {
-  n = convertInteger(n)
-  checkArg(n, "integer", len=1L, na.ok=FALSE)
-  checkArg(par.set, "ParamSet")
+#' generateDesign(10, ps, trafo = TRUE)
+generateDesign = function(n = 10L, par.set, fun, fun.args = list(), trafo = FALSE, augment = 20L) {
+
+  n = asInt(n)
+  z = doBasicGenDesignChecks(par.set)
+  lower = z$lower; upper = z$upper
+
   requirePackages("lhs", "generateDesign")
-  if (missing(fun))  
+  if (missing(fun))
     fun = lhs::randomLHS
-  else  
-    checkArg(fun, "function")
-  checkArg(fun.args, "list")
-  checkArg(trafo, "logical", len=1L, na.ok=FALSE)
-  checkArg(ints.as.num, "logical", len=1L, na.ok=FALSE)
-  checkArg(discretes.as.factor, "logical", len=1L, na.ok=FALSE)
-  
-  if (length(par.set$pars) == 0)
-    stop("par.set must not be empty!")        
-  if(any(sapply(par.set$pars, function(x) is(x, "LearnerParameter"))))
-    stop("No par.set parameter in 'generateDesign' can be of class 'LearnerParameter'! Use basic parameters instead to describe you region of interest!")        
-  lower = getLower(par.set)
-  upper = getUpper(par.set)
-  
-  if (any(is.infinite(c(lower, upper))))
-    stop("generateDesign requires finite box constraints!")
-  
+  else
+    assertFunction(fun)
+  assertList(fun.args)
+  assertFlag(trafo)
+  augment = asInt(augment, lower = 0L)
+
+  ### precompute some useful stuff
   pars = par.set$pars
-  
-  k = sum(getParamLengths(par.set))
-  des = do.call(fun, c(list(n=n, k=k), fun.args))
-  des = as.data.frame(des)
-  
-  col = 0
-  for (i in 1:length(pars)) {
-    p = pars[[i]]
-    cc = rev(col)[1]
-    if (p$type %in% c("numericvector", "integervector", "discretevector", "logicalvector")) 
-      col = (cc + 1) : (cc + p$len)   
-    else 
-      col = cc + 1    
-    trafo.fun = if (trafo && !is.null(p$trafo)) p$trafo else identity
-    if (p$type == "numeric")
-      v = (p$upper-p$lower)*des[,col] + p$lower
-    else if (p$type == "integer") {
-      v = as.integer(floor((p$upper-p$lower+1)*des[,col] + p$lower))
-    } else if (p$type == "numericvector") {
-      v = t((p$upper-p$lower)*t(des[,col]) + p$lower)
-    } else if (p$type == "integervector") {
-      v = floor((p$upper-p$lower+1)*as.matrix(des[,col]) + p$lower)
-      if (!ints.as.num)
-        mode(v) = "integer"
-    } else if (p$type %in% c("logical", "logicalvector"))
-      v = ifelse(des[,col] <= 0.5, FALSE, TRUE)
-    else if (p$type %in% c("discrete", "discretevector")) {
-      ns = names(p$values)
-      indices = ceiling(des[,col,drop=FALSE] * length(ns))
-      v = lapply(1:ncol(indices), function(i) {
-        ns[indices[,i]]
-      })
-      v = do.call(function(...) data.frame(..., stringsAsFactors=FALSE), v)
+  lens = getParamLengths(par.set)
+  k = sum(lens)
+  pids1 = getParamIds(par.set, repeated = TRUE, with.nr = TRUE)
+  pids2 = getParamIds(par.set, repeated = TRUE, with.nr = FALSE)
+  lower2 = setNames(rep(NA_real_, k), pids1)
+  lower2 = insert(lower2, lower)
+  upper2 = setNames(rep(NA_real_, k), pids1)
+  upper2 = insert(upper2, upper)
+  values1 = getValues(par.set)
+  values2 = vector("list", k)
+  nlevs = setNames(rep(NA_integer_, k), pids1)
+  for (i in seq_len(k))
+    values2[[i]] = names(values1[[pids2[i]]])
+  types.df = getParamTypes(par.set, df.cols = TRUE)
+  types.int = convertTypesToCInts(types.df)
+  types.df[types.df == "factor"] = "character"
+  # ignore trafos if the user did not request transformed values
+  trafos = if(trafo)
+    lapply(pars, function(p) p$trafo)
+  else
+    replicate(length(pars), NULL, simplify = FALSE)
+  par.requires = lapply(pars, function(p) p$requires)
+
+
+  nmissing = n
+  iter = 0
+  # result objects
+  res = data.frame()
+  des = matrix(nrow = 0, ncol = k)
+  repeat {
+    ### get design, types converted, trafos, conditionals set to NA
+    # create new design or augment if we already have some points
+    newdes = if (nmissing == n)
+      do.call(fun, insert(list(n = nmissing, k = k), fun.args))
+    else
+      randomLHS(nmissing, k = k)
+    # preallocate result for C
+    newres = makeDataFrame(nmissing, k, col.types = types.df)
+    newres = .Call(c_generateDesign, newdes, newres, types.int, lower2, upper2, values2)
+    colnames(newres) = pids1
+    # check each row if forbidden, then remove
+    if (hasForbidden(par.set)) {
+      #FIXME: this is pretty slow, but correct
+      fb = rowSapply(newres, isForbidden, par.set = par.set)
+      newres = newres[!fb, , drop = FALSE]
+      newdes = newdes[!fb, , drop = FALSE]
     }
-    
-    # trafo
-    if (trafo) {
-      if (p$type %in% c("numeric", "integer"))
-        v = trafo.fun(v)
-      else if (p$type %in% c("numericvector", "integervector"))
-        v = t(apply(v, 1, trafo.fun))
-    }
-    des[, col] = v
+    newres = .Call(c_trafo_and_set_dep_to_na, newres, types.int, names(pars), lens, trafos, par.requires, new.env())
+    # add to result (design matrix and data.frame)
+    des = rbind(des, newdes)
+    res = rbind(res, newres)
+    # remove duplicates
+    to.remove = duplicated(res)
+    des = des[!to.remove, , drop = FALSE]
+    res = res[!to.remove, , drop = FALSE]
+    nmissing = n - nrow(res)
+
+    # enough points or augment tries? we are done!
+    iter = iter + 1L
+    if (nmissing == 0L || iter >= augment)
+      break
   }
-  
-  #FIXME: *very* inefficient
-  vals = dfRowsToList(des, par.set)
-  for (i in 1:length(vals)) {
-    v = vals[[i]]
-    col = 0
-    for (j in seq_along(par.set$pars)) {
-      p = par.set$pars[[j]]
-      cc = rev(col)[1]
-      if (p$type %in% c("numericvector", "integervector", "discretevector", "logicalvector")) 
-        col = (cc + 1) : (cc + p$len)   
-      else 
-        col = cc + 1      
-      if (!is.null(p$requires) && !requiresOk(par.set, v, j)) {
-        des[i, col] = NA
-      }
+
+  if (nrow(res) < n)
+    warningf("generateDesign could only produce %i points instead of %i!", nrow(res), n)
+
+  colnames(res) = pids1
+
+  # convert to factor and set levels so we have all of them
+  for (i in seq_col(res)) {
+    if (types.int[i] == 3L) {
+      res[, i] = factor(res[, i], levels = values2[[i]])
     }
   }
-  
-  colnames(des) = getParamIds(par.set, repeated=TRUE, with.nr=TRUE)
-  des = convertDfCols(des, ints.as.num=ints.as.num, chars.as.factor=discretes.as.factor, logicals.as.factor=logicals.as.factor)
-  attr(des, "trafo") = trafo
-  return(des)
+  attr(res, "trafo") = trafo
+  return(res)
 }

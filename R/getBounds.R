@@ -1,76 +1,63 @@
-#' Get lower bounds for numerical / integer parameters.
-#' 
+#' Get lower / upper bounds and allowed discrete values for parameters.
+#'
+#' \code{getLower} and \code{getUpper} return a numerical vector of lower and upper
+#' bounds, \code{getValues} returns a list of possible value sets for discrete parameters.
+#'
+#' Parameters for which such bound make no sense - due to their type - are not present in the result.
+#'
 #' @param par.set [\code{\link{ParamSet}}]\cr
 #'   Parameter set.
-#' @return Numeric vector of lower bounds. The lower
-#'   bounds are all concatenated and the vector is named by the parameter names with 
-#'   \code{getParamIds(..., repeated=TRUE, with.nr=FALSE)}.
+#' @param with.nr [\code{logical(1)}]\cr
+#'   Should number from 1 to length be appended to names of vector params?
+#'   Default is \code{FALSE}.
+#' @return [\code{vector} | \code{list}]. Named by parameter ids.
 #' @export
-#' @examples 
-#' ps <- makeParamSet(
+#' @examples
+#' ps = makeParamSet(
 #'   makeNumericParam("u"),
-#'   makeIntegerParam("v", lower=1, upper=2),
-#'   makeDiscreteParam("w", values=1:2),
-#'   makeNumericVectorParam("x", len=2, lower=c(0, 10), upper=c(1, 11))
+#'   makeIntegerParam("v", lower = 1, upper = 2),
+#'   makeDiscreteParam("w", values = 1:2),
+#'   makeNumericVectorParam("x", len = 2, lower = c(0, 10), upper = c(1, 11))
 #' )
 #' getLower(ps)
-getLower = function(par.set) {
-  checkArg(par.set, "ParamSet")
-  par.set = filterParams(par.set, c("numeric", "integer", "numericvector", "integervector")) 
-  if (length(par.set$pars) == 0)
-    return(numeric(0))
-  bounds = lapply(par.set$pars, function(p) p$lower)
-  bounds = do.call(c, bounds)
-  names(bounds) = getParamIds(par.set, repeated=TRUE, with.nr=FALSE)
-  return(bounds)
-}
-
-#' Get upper bounds for numerical / integer parameters.
-#' 
-#' @param par.set [\code{\link{ParamSet}}]\cr
-#'   Parameter set.
-#' @return Numeric vector of upper bounds. The upper
-#'   bounds are all concatenated and the vector is named by the parameter names with 
-#'   \code{getParamIds(..., repeated=TRUE, with.nr=FALSE)}.
-#' @export
-#' @examples 
-#' ps <- makeParamSet(
-#'   makeNumericParam("u"),
-#'   makeIntegerParam("v", lower=1, upper=2),
-#'   makeDiscreteParam("w", values=1:2),
-#'   makeNumericVectorParam("x", len=2, lower=c(0, 10), upper=c(1, 11))
-#' )
 #' getUpper(ps)
-getUpper = function(par.set) {
-  checkArg(par.set, "ParamSet")
-  par.set = filterParams(par.set, c("numeric", "integer", "numericvector", "integervector")) 
-  if (length(par.set$pars) == 0)
-    return(numeric(0))
-  bounds = lapply(par.set$pars, function(p) p$upper)
-  bounds = do.call(c, bounds)
-  if (length(bounds) > 0)
-    names(bounds) = getParamIds(par.set, repeated=TRUE, with.nr=FALSE)
-  return(bounds)
-}
-
-#' Get possible values for discrete parameters.
-#' 
-#' @param par.set [\code{\link{ParamSet}}]\cr
-#'   Parameter set.
-#' @return [\code{list}]. A named list of named lists of values. 
-#' @export
-#' @examples 
-#' ps <- makeParamSet(
+#'
+#' ps = makeParamSet(
 #'   makeNumericParam("u"),
-#'   makeDiscreteParam("v", values=c("a", "b")),
-#'   makeDiscreteParam("w", values=list(a=list(), b=NULL))
+#'   makeDiscreteParam("v", values = c("a", "b")),
+#'   makeDiscreteParam("w", values = list(a = list(), b = NULL))
 #' )
 #' getValues(ps)
-getValues = function(par.set) {
-  checkArg(par.set, "ParamSet")
-  par.set = filterParams(par.set, c("discrete", "discretevector", "logical", "logicalvector"))
-  if (length(par.set$pars) == 0)
-    return(list())
-  lapply(par.set$pars, function(p) p$values)
+getLower = function(par.set, with.nr = FALSE) {
+  return(getBounds(par.set, type.of.bounds = "lower", with.nr = with.nr))
 }
 
+#' @export
+#' @rdname getLower
+getUpper = function(par.set, with.nr = FALSE) {
+  return(getBounds(par.set, type.of.bounds = "upper", with.nr = with.nr))
+}
+
+#' @export
+#' @rdname getLower
+getValues = function(par.set) {
+  assertClass(par.set, "ParamSet")
+  types = getParamTypes(par.set)
+  is.disc = types %in% c("discrete", "discretevector", "logical", "logicalvector")
+  if (!any(is.disc))
+    return(list())
+  lapply(par.set$pars[is.disc], function(p) p$values)
+}
+
+# common functionality of getLower and getUpper
+getBounds = function(par.set, type.of.bounds, with.nr = FALSE) {
+  assertClass(par.set, "ParamSet")
+  types = getParamTypes(par.set)
+  is.num = types %in% c("numeric", "integer", "numericvector", "integervector")
+  if (!any(is.num))
+    return(numeric(0))
+  bounds = lapply(par.set$pars[is.num], function(p) p[[type.of.bounds]])
+  bounds = do.call(c, bounds)
+  names(bounds) = getParamIds2(par.set$pars[is.num], repeated = TRUE, with.nr = with.nr)
+  return(bounds)
+}
