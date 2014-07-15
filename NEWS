@@ -1,3 +1,13 @@
+ParamHelpers_1.3:
+- Vector params (num, int and log) can now have component names
+  Functions that produce such vector values (e.g. sampleValue or dfRowsToList)
+  will name the components of this vector automatically. 
+  The user can also call setValueCNames in his own code.
+- new functions
+-- getOptPathCols
+-- setValueCNames
+-- repairPoint
+
 ParamHelpers_1.2:
 - normal parameters can now have a default value
 - parameter spaces can now define a forbidden region of infeasibility.
@@ -22,6 +32,7 @@ ParamHelpers_1.2:
 -- generateGridDesign
 -- getOptPathExecTimes, getOptPathErrorMessages
 -- getOptPathParetoFront
+-- getOptPathCol
 
 ParamHelpers_1.1-35:
 - concept of dependent parameters was introduced (argument "requires")
