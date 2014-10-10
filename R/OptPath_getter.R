@@ -31,6 +31,17 @@ getOptPathEl = function(op, index) {
   UseMethod("getOptPathEl")
 }
 
+#' Get data.frame of input points (X-space) referring to the param set from the optimization path.
+#'
+#' @template arg_op
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
+#' @return [\code{data.frame}].
+#' @export
+#' @family optpath
+getOptPathX = function(op, dob, eol) {
+  UseMethod("getOptPathX")
+}
 
 #' Get y-vector or y-matrix from the optimization path.
 #'
@@ -38,53 +49,63 @@ getOptPathEl = function(op, index) {
 #' @param names [\code{character}]\cr
 #'   Names of performance measure.
 #'   Default is all performance measures in path.
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @param drop [\code{logical(1)}]\cr
 #'   Return vector instead of matrix when only one y-column was selected?
 #'   Default is \code{TRUE}.
 #' @return [\code{numeric} | \code{matrix}]. The columns of the matrix are always named.
 #' @export
 #' @family optpath
-getOptPathY = function(op, names, drop = TRUE) {
+getOptPathY = function(op, names, dob, eol, drop = TRUE) {
   UseMethod("getOptPathY")
 }
 
 #' Get date-of-birth vector from the optimization path.
 #'
 #' @template arg_op
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @return [\code{integer}].
 #' @export
 #' @family optpath
-getOptPathDOB = function(op) {
+getOptPathDOB = function(op, dob, eol) {
   UseMethod("getOptPathDOB")
 }
 
 #' Get end-of-life vector from the optimization path.
 #'
 #' @template arg_op
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @return [\code{integer}].
 #' @export
 #' @family optpath
-getOptPathEOL = function(op) {
+getOptPathEOL = function(op, dob, eol) {
   UseMethod("getOptPathEOL")
 }
 
 #' Get error-message vector from the optimization path.
 #'
 #' @template arg_op
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @return [\code{character}].
 #' @export
 #' @family optpath
-getOptPathErrorMessages = function(op) {
+getOptPathErrorMessages = function(op, dob, eol) {
   UseMethod("getOptPathErrorMessages")
 }
 
 #' Get exec-time vector from the optimization path.
 #'
 #' @template arg_op
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @return [\code{numeric}].
 #' @export
 #' @family optpath
-getOptPathExecTimes = function(op) {
+getOptPathExecTimes = function(op, dob, eol) {
   UseMethod("getOptPathExecTimes")
 }
 
@@ -93,10 +114,12 @@ getOptPathExecTimes = function(op) {
 #' @template arg_op
 #' @param name [\code{character(1)}]\cr
 #'   Name of the column.
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @return Single column as a vector.
 #' @export
 #' @family optpath
-getOptPathCol = function(op, name) {
+getOptPathCol = function(op, name, dob, eol) {
   UseMethod("getOptPathCol")
 }
 
@@ -105,11 +128,13 @@ getOptPathCol = function(op, name) {
 #' @template arg_op
 #' @param names [\code{character}]\cr
 #'   Names of the columns.
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @inheritParams as.data.frame.OptPathDF
 #' @return [\code{data.frame}].
 #' @export
 #' @family optpath
-getOptPathCols = function(op, names, row.names = NULL) {
+getOptPathCols = function(op, names, dob, eol, row.names = NULL) {
   UseMethod("getOptPathCols")
 }
 
@@ -119,10 +144,8 @@ getOptPathCols = function(op, names, row.names = NULL) {
 #' @param y.name [\code{character(1)}]\cr
 #'   Name of target value to decide which element is best.
 #'   Default is \code{y.names[1]}.
-#' @param dob [\code{integer}]\cr
-#'   Possible dates of birth to select best element from. Defaults to all.
-#' @param eol [\code{integer}]\cr
-#'   Possible end of life to select best element from. Defaults to all.
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @param ties [\code{character(1)}]\cr
 #'   How should ties be broken when more than one optimal element is found?
 #'   \dQuote{all}: return all indices,
@@ -183,10 +206,8 @@ getOptPathBestIndex = function(op, y.name = op$y.names[1], dob = op$env$dob, eol
 #' @param y.names [\code{character}]\cr
 #'   Names of performance measures to construct pareto front for.
 #'   Default is all performance measures.
-#' @param dob [\code{integer}]\cr
-#'   Possible dates of birth to select elements from. Defaults to all.
-#' @param eol [\code{integer}]\cr
-#'   Possible end of life to select elements from. Defaults to all.
+#' @template arg_opgetter_dob
+#' @template arg_opgetter_eol
 #' @param index [\code{logical(1)}]\cr
 #'   Return indices into path of front or y-matrix of nondominated points?
 #'   Default is \code{FALSE}.
@@ -206,7 +227,7 @@ getOptPathBestIndex = function(op, y.name = op$y.names[1], dob = op$env$dob, eol
 #' getOptPathParetoFront(op, index = TRUE)
 getOptPathParetoFront = function(op, y.names = op$y.names, dob = op$env$dob, eol = op$env$eol, index = FALSE) {
   assertClass(op, "OptPath")
-  assertCharacter(y.names, len = 2L)
+  assertCharacter(y.names, min.len = 2)
   assertSubset(y.names, op$y.names, empty.ok = FALSE)
   dob = asInteger(dob, any.missing = TRUE)
   eol = asInteger(eol, any.missing = TRUE)
@@ -215,14 +236,20 @@ getOptPathParetoFront = function(op, y.names = op$y.names, dob = op$env$dob, eol
   life.inds = which(op$env$dob %in% dob & op$env$eol %in% eol)
   if (length(life.inds) == 0)
     stop("No element found which matches dob and eol restrictions!")
-  y = getOptPathY(op, y.names, drop = FALSE)[life.inds, ]
+  y = getOptPathY(op, y.names, drop = FALSE)[life.inds, , drop = FALSE]
   # multiply columns with -1 if maximize
   k = ifelse(op$minimize, 1, -1)
   y2 = t(y) * k
-  nondom = which(!is_dominated(y2))
+  # is_dominated has kind of buggy behavoiur if y2 is a row
+  # (it hinks, we have a 1-dimensional optimization prob und returns the min index)
+  # so we have to treat this case manually
+  if (nrow(y2) == 1)
+    nondom = 1
+  else
+    nondom = which(!emoa::is_dominated(y2))
   if (index)
     return(life.inds[nondom])
   else
-    y[nondom,]
+    y[nondom, , drop = FALSE]
 }
 

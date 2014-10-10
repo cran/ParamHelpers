@@ -22,20 +22,13 @@
 #'    grid design, but the way parameter dependencies are handled make this possible.}
 #' }
 #'
-#' @param par.set [\code{\link{ParamSet}}]\cr
-#'   Parameter set.
+#' @template arg_parset
 #' @param resolution [\code{integer}]\cr
 #'   Resolution of the grid for each numeric/integer parameter in \code{par.set}.
 #'   For vector parameters, it is the resolution per dimension.
 #'   Either pass one resolution for all parameters, or a named vector.
-#' @param trafo [\code{logical(1)}]\cr
-#'   Transform all parameters by using theirs respective transformation functions.
-#'   Default is \code{FALSE}.
-#' @return [\code{data.frame}]. Columns are named by the ids of the parameters.
-#'   If the \code{par.set} argument contains a vector parameter, its corresponding column names
-#'   in the design are the parameter id concatenated with 1 to dimension of the vector.
-#'   The result will have an \code{logical(1)} attribute \dQuote{trafo},
-#'   which is set to the value of argument \code{trafo}.
+#' @template arg_trafo
+#' @template ret_gendes_df
 #' @export
 #' @examples
 #' ps = makeParamSet(

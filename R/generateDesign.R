@@ -43,11 +43,8 @@
 #' with complicated dependences and forbidden regions, if one wants to ensure that points actually
 #' get added... But we are working on it,
 #'
-#' @param n [\code{integer(1)}]\cr
-#'   Number of samples in design.
-#'   Default is 10.
-#' @param par.set [\code{\link{ParamSet}}]\cr
-#'   Parameter set.
+#' @template arg_gendes_n
+#' @template arg_parset
 #' @param fun [\code{function}]\cr
 #'   Function from package lhs.
 #'   Possible are: \code{\link[lhs]{maximinLHS}}, \code{\link[lhs]{randomLHS}},
@@ -65,11 +62,7 @@
 #'   If the the design is of size less than \code{n} after all tries, a warning is issued
 #'   and the smaller design is returned.
 #'   Default is 20.
-#' @return The created design is a data.frame. Columns are named by the ids of the parameters.
-#'   If the \code{par.set} argument contains a vector parameter, its corresponding column names
-#'   in the design are the parameter id concatenated with 1 to dimension of the vector.
-#'   The result will have an \code{logical(1)} attribute \dQuote{trafo},
-#'   which is set to the value of argument \code{trafo}.
+#' @template ret_gendes_df
 #' @export
 #' @useDynLib ParamHelpers c_generateDesign c_trafo_and_set_dep_to_na
 #' @examples
@@ -138,7 +131,7 @@ generateDesign = function(n = 10L, par.set, fun, fun.args = list(), trafo = FALS
     newdes = if (nmissing == n)
       do.call(fun, insert(list(n = nmissing, k = k), fun.args))
     else
-      randomLHS(nmissing, k = k)
+      lhs::randomLHS(nmissing, k = k)
     # preallocate result for C
     newres = makeDataFrame(nmissing, k, col.types = types.df)
     newres = .Call(c_generateDesign, newdes, newres, types.int, lower2, upper2, values2)

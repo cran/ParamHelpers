@@ -1,7 +1,6 @@
 #' Returns type information for a parameter set.
 #'
-#' @param par.set [\code{\link{ParamSet}}]\cr
-#'   Parameter set.
+#' @template arg_parset
 #' @param df.cols [\code{logical(1)}]\cr
 #'   If \code{FALSE} simply return the parameter types in the set,
 #'   i.e., \code{par$type}.
@@ -19,7 +18,7 @@
 #'   Default is \code{FALSE}.
 #' @param with.nr [\code{logical(1)}]\cr
 #'   Should number from 1 to length be appended to name?
-#'   Only used if \code{use.name} and are \code{TRUE}.
+#'   Only used if \code{use.name} and \code{df.cols} are \code{TRUE}.
 #'   Default is \code{TRUE}.
 #' @return [\code{character}].
 #' @export
@@ -34,7 +33,7 @@ getParamTypes = function(par.set, df.cols = FALSE, df.discretes.as.factor = TRUE
   recode = function(types, ...) {
     args = as.character(list(...))
     for (i in seq(1, length(args), 2)) {
-      types[types == args[i]] = args[i+1]
+      types[types == args[i]] = args[i + 1]
     }
     types = rep(types, getParamLengths(par.set))
     return(types)

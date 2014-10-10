@@ -13,12 +13,16 @@ test_that("OptPath", {
   expect_equal(op$env$eol[2], 8)
 
   # test getters
+  expect_equal(getOptPathX(op), data.frame(x = 1:2, y = "a"))
+  expect_equal(getOptPathX(op, dob = 2), data.frame(x = 2, y = "a"))
+
   expect_equal(getOptPathY(op, "z1"), c(1,3))
   expect_equal(getOptPathY(op, "z2"), c(4,2))
   expect_equal(getOptPathY(op), matrix(c(1, 3, 4, 2), nrow = 2L, dimnames = list(1:2, c("z1", "z2"))))
   expect_equal(getOptPathY(op, "z2", drop = FALSE), matrix(c(4, 2), nrow = 2L, dimnames = list(1:2, c("z2"))))
   expect_equal(getOptPathY(op, "z2", drop = TRUE), c(4, 2))
   expect_equal(getOptPathY(op, "z2"), c(4,2))
+  expect_equal(getOptPathY(op, eol = 8), matrix(c(3, 2), nrow = 1L, dimnames = list(2, c("z1", "z2"))))
   expect_equal(getOptPathDOB(op), c(1,2))
   expect_equal(getOptPathEOL(op), c(NA,8))
 
@@ -170,9 +174,17 @@ test_that("requires works", {
     makeIntegerVectorParam("z", len = 2, lower = 1, upper = 20, requires = quote(x == "b"))
   )
   op = makeOptPathDF(par.set = ps, y.names = "foo", minimize = TRUE)
+  el = list(x = "b", y = NA, z = 1:2)
+  addOptPathEl(op, x = el, y = 0)
+  # check that correct NAs are present
+  expect_equal(op$env$path[, 2:4], data.frame(y = NA_real_, z1 = 1L, z2 = 2L))
+
+  op = makeOptPathDF(par.set = ps, y.names = "foo", minimize = TRUE)
   el = list(x = "a", y = 1, z = NA)
   addOptPathEl(op, x = el, y = 0)
   expect_equal(getOptPathEl(op, 1)$x, el)
+  # check that correct NAs are present
+  expect_equal(op$env$path[, 2:4], data.frame(y = 1, z1 = NA_integer_, z2 = NA_integer_))
   el = list(x = "b", y = NA, z = c(2, 3))
   addOptPathEl(op, x = el, y = 0)
   expect_equal(getOptPathEl(op, 2)$x, el)
@@ -184,6 +196,8 @@ test_that("pareto front", {
   ps = makeParamSet(makeNumericParam("x"))
   op = makeOptPathDF(par.set = ps, y.names = c("y1", "y2"), minimize = c(TRUE, TRUE))
   addOptPathEl(op, x = list(x = 3), y = c(9, 4))
+  f = getOptPathParetoFront(op, index = FALSE)
+  expect_equal(f, matrix(c(9, 4), nrow = 1L, dimnames = list(1, c("y1", "y2"))))
   addOptPathEl(op, x = list(x = 4), y = c(4, 9))
   addOptPathEl(op, x = list(x = 1), y = c(5, 3))
   addOptPathEl(op, x = list(x = 2), y = c(2, 4))
@@ -247,15 +261,19 @@ test_that("as.data.frame flags and getCols works", {
   df1 = as.data.frame(op, include.rest = FALSE, discretes.as.factor = TRUE)
   df2 = as.data.frame(op, include.rest = FALSE, include.x = FALSE, discretes.as.factor = TRUE)
   df3 = as.data.frame(op, include.y = FALSE, include.x = FALSE, discretes.as.factor = TRUE)
+  df4 = as.data.frame(op, include.y = TRUE, include.x = TRUE, include.rest = TRUE, dob = 2L)
   expect_equal(nrow(df1), 2)
   expect_equal(nrow(df2), 2)
   expect_equal(nrow(df3), 2)
-  expect_equal(ncol(df1), 4)
+  expect_equal(nrow(df4), 1)
   expect_equal(ncol(df2), 2)
   expect_equal(ncol(df3), 3)
+  expect_equal(ncol(df4), 7)
   expect_equal(sapply(df1, class), c(x = "numeric", y = "factor", z1 = "numeric", z2 = "numeric"))
   expect_equal(sapply(df2, class), c(z1 = "numeric", z2 = "numeric"))
   expect_equal(sapply(df3, class), c(dob = "integer", eol = "integer", ee = "numeric"))
+  expect_equal(sapply(df4, class), c(x = "numeric", y = "factor", z1 = "numeric", z2 = "numeric",
+    dob = "integer", eol = "integer", ee = "numeric"))
   expect_error(getOptPathCol(op,"bla"), "not present")
   expect_equal(getOptPathCol(op, "dob"), c(1, 2))
   expect_equal(getOptPathCol(op, "eol"), c(NA_integer_, NA_integer_))
@@ -274,4 +292,21 @@ test_that("as.data.frame flags and getCols works", {
   expect_equal(dim(d), c(2L, 1L))
   expect_true(is.factor(d$y))
 
+})
+
+
+test_that("opt.path printing works", {
+  ps = makeParamSet(
+    makeNumericParam("x"),
+    makeDiscreteParam("y", values = c("a", "b"))
+  )
+  op = makeOptPathDF(par.set = ps, y.names = c("z1", "z2"), minimize = c(TRUE, FALSE))
+  expect_output(print(op), "Optimization path")
+  addOptPathEl(op, x = list(x = 1, y = "a"), y = c(z1 = 1, z2 = 4))
+  expect_output(print(op), "Optimization path")
+
+  op = makeOptPathDF(par.set = ps, y.names = "z1", minimize = TRUE, include.exec.time = TRUE)
+  expect_output(print(op), "Exec times: TRUE. Range: 0 - 0")
+  addOptPathEl(op, x = list(x = 1, y = "a"), y = c(z1 = 1), exec.time = 3)
+  expect_output(print(op), "Exec times: TRUE. Range: 3 - 3")
 })
