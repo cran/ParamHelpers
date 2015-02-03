@@ -1,13 +1,14 @@
 context("convertParamSetToIrace")
 
 test_that("convertParamSetToIrace", {
+  requirePackages("_irace")
   runIrace = function(ps, hook.run, max.exps = 10) {
     ip = convertParamSetToIrace(ps)
     expect_equal(getParamIds(ps, repeated = TRUE, with.nr = TRUE), as.character(ip$names))
     res = capture.output(
-      irace(
+      irace::irace(
         tunerConfig = list(
-          hookRun = hook.run, 
+          hookRun = hook.run,
           instances = 1:10,
           maxExperiments = max.exps,
           logFile = tempfile()
@@ -15,9 +16,8 @@ test_that("convertParamSetToIrace", {
         parameters = ip
       )
     )
-    
   }
-  
+
   ps = makeParamSet(
     makeLogicalParam("v1"),
     makeNumericParam("x1", lower = 1, upper = 4),
@@ -43,4 +43,12 @@ test_that("convertParamSetToIrace", {
     1
   }
   runIrace(ps, hook.run, max.exps = 300)
+})
+
+test_that("convertParamSetToIrace checks box constraints", {
+  ps = makeParamSet(
+    makeIntegerLearnerParam(id = "i", lower = 1L)
+  )
+
+  expect_error(convertParamSetToIrace(ps), "finite box")
 })

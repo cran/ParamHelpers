@@ -1,9 +1,10 @@
 Package: ParamHelpers
-Title: Helpers for parameters in black-box optimization, tuning and
-        machine learning.
-Description: A small package containing useful functions for parameter
-    descriptions and operations in black-box optimization, tuning
-    and machine learning.
+Title: Helpers for Parameters in Black-Box Optimization, Tuning and
+        Machine Learning.
+Description: Functions for parameter descriptions and operations in black-box optimization, tuning
+    and machine learning. Parameters can be described (type, constraints, defaults, etc.),
+    combined to parameter sets and can in general be programmed on.
+    A useful OptPath object (archive) to log function evaluations is also provided.
 Authors@R: c(person("Bernd", "Bischl", email = "bernd_bischl@gmx.net", role =
     c("aut", "cre")), person("Michel", "Lang", email =
     "michellang@gmail.com", role = "aut"), person("Jakob", "Bossek",
@@ -12,12 +13,12 @@ Authors@R: c(person("Bernd", "Bischl", email = "bernd_bischl@gmx.net", role =
 URL: https://github.com/berndbischl/ParamHelpers
 BugReports: https://github.com/berndbischl/ParamHelpers/issues
 License: BSD_3_clause + file LICENSE
-Imports: BBmisc (>= 1.7), checkmate (>= 1.4)
+Imports: BBmisc (>= 1.9), checkmate (>= 1.5.1)
 Suggests: emoa, lhs, irace, testthat, soobench
 LazyData: yes
 ByteCompile: yes
-Version: 1.4
-Packaged: 2014-10-10 13:38:55 UTC; bischl
+Version: 1.5
+Packaged: 2015-02-03 16:59:12 UTC; bischl
 Author: Bernd Bischl [aut, cre],
   Michel Lang [aut],
   Jakob Bossek [aut],
@@ -25,4 +26,4 @@ Author: Bernd Bischl [aut, cre],
 Maintainer: Bernd Bischl <bernd_bischl@gmx.net>
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-10-10 21:54:16
+Date/Publication: 2015-02-03 18:04:35
