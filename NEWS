@@ -1,3 +1,20 @@
+ParamHelpers_1.6:
+- added new character parameter types, see new functions below
+- added property 'tunable' to make*Param
+- isFeasible supports named lists for unordered checks
+- numeric and numericvector Params and LearnerParams have a new arg 'allow.inf'
+- filterParams can now filter based on 'ids' and 'tunable'
+- convertParamSetToIrace: removed argument 'digits' to keep maximum precision of boundaries
+- added renderOptPathPlot and plotOptPath for plotting of optimization paths.
+- added plotEAF and plotYTraces to compare singlecrit and bicrit optimization paths.
+- new functions
+-- isRequiresOk
+-- plotEAF
+-- plotYTraces
+-- renderOptPathPlot, plotOptPath
+-- makeCharacterParam, makeCharacterVectorParam
+-- isCharacter, hasCharacter
+
 ParamHelpers_1.5:
 - added constr.clip to print.ParamSet and related internal functions to make prints more readable
 - getDefaults: new option include.null

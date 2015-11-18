@@ -13,7 +13,7 @@
 #' @template arg_par_or_set
 #' @param x [any] \cr
 #'   Single value to check.
-#'   For a parameter set this must be a list in the correct order.
+#'   For a parameter set this must be a list.
 #' @return logical(1)
 #' @examples
 #' p = makeNumericParam("x", lower = -1, upper = 1)
@@ -46,10 +46,15 @@ isFeasible.LearnerParam = function(par, x) {
 
 #' @export
 isFeasible.ParamSet = function(par, x) {
-  if (!(is.list(x) && length(x) == length(par$pars) && all(names(x) == names(par$pars))))
+  named = testNamed(x)
+  if (!is.list(x) || !(!named || all(names(x) %in% names(par$pars)) || !(named || length(x) == length(par$pars))))
     return(FALSE)
   if (isForbidden(par, x))
     return(FALSE)
+  if (named) {
+    par = filterParams(par, ids = names(x))
+    x = x[names(par$pars)]
+  }
   #FIXME: very slow
   for (i in seq_along(par$pars)) {
     p = par$pars[[i]]
@@ -77,17 +82,16 @@ isFeasible.ParamSet = function(par, x) {
 # are the contraints ok for value of a param (not considering requires)
 constraintsOkParam = function(par, x) {
   type = par$type
-
   # this should work in any! case.
   if (type == "untyped")
     return(TRUE)
   inValues = function(v) any(sapply(par$values, function(w) isTRUE(all.equal(w, v))))
   ok = if (type == "numeric")
-    is.numeric(x) && length(x) == 1 && is.finite(x) && x >= par$lower && x <= par$upper
+    is.numeric(x) && length(x) == 1 && (par$allow.inf || is.finite(x)) && x >= par$lower && x <= par$upper
   else if (type == "integer")
     is.numeric(x) && length(x) == 1 && is.finite(x) && x >= par$lower && x <= par$upper && x == as.integer(x)
   else if (type == "numericvector")
-    is.numeric(x) && length(x) == par$len && all(is.finite(x) & x >= par$lower & x <= par$upper)
+    is.numeric(x) && length(x) == par$len && all((par$allow.inf | is.finite(x)) & x >= par$lower & x <= par$upper)
   else if (type == "integervector")
     is.numeric(x) && length(x) == par$len && all(is.finite(x) & x >= par$lower & x <= par$upper & x == as.integer(x))
   else if (type == "discrete")
@@ -98,6 +102,10 @@ constraintsOkParam = function(par, x) {
     is.logical(x) && length(x) == 1 && !is.na(x)
   else if (type == "logicalvector")
     is.logical(x) && length(x) == par$len && !any(is.na(x))
+  else if (type == "character")
+    is.character(x) && length(x) == 1 && !is.na(x)
+  else if (type == "charactervector")
+    is.character(x) && length(x) == par$len && !any(is.na(x))
   else if (type == "function")
     is.function(x)
 
@@ -127,5 +135,9 @@ constraintsOkLearnerParam = function(par, x) {
 # is the requires part of the ith param valid for value x (x[[i]] is value or ith param)
 # assumes that param actually has a requires part
 requiresOk = function(par.set, x, i) {
-  eval(par.set$pars[[i]]$requires, envir = x)
+  if (is.null(par.set$pars[[i]]$requires)) {
+    TRUE
+  } else {
+    isTRUE(eval(par.set$pars[[i]]$requires, envir = x))
+  }
 }

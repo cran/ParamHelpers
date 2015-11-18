@@ -11,18 +11,19 @@
 #'   Default is \code{FALSE}.
 #' @param df.discretes.as.factor [\code{logical(1)}]\cr
 #'   If \code{df.cols} is \code{TRUE}:
-#'   Should type for discrete params be \code{facor} or \code{character}?
+#'   Should type for discrete params be \code{factor} or \code{character}?
 #'   Default is \code{TRUE}.
 #' @param use.names [\code{logical(1)}]\cr
 #'   Name the result vector?
 #'   Default is \code{FALSE}.
 #' @param with.nr [\code{logical(1)}]\cr
 #'   Should number from 1 to length be appended to name?
-#'   Only used if \code{use.name} and \code{df.cols} are \code{TRUE}.
+#'   Only used if \code{use.names} and \code{df.cols} are \code{TRUE}.
 #'   Default is \code{TRUE}.
 #' @return [\code{character}].
 #' @export
-getParamTypes = function(par.set, df.cols = FALSE, df.discretes.as.factor = TRUE, use.names = FALSE, with.nr = TRUE) {
+getParamTypes = function(par.set, df.cols = FALSE, df.discretes.as.factor = TRUE,
+  use.names = FALSE, with.nr = TRUE) {
   assertClass(par.set, "ParamSet")
   assertFlag(df.cols)
   assertFlag(df.discretes.as.factor)
@@ -46,7 +47,8 @@ getParamTypes = function(par.set, df.cols = FALSE, df.discretes.as.factor = TRUE
         "integervector", "integer",
         "discrete", "factor",
         "discretevector", "factor",
-        "logicalvector", "logical"
+        "logicalvector", "logical",
+        "charactervector", "character"
       )
     } else {
       recode(types,
@@ -54,7 +56,8 @@ getParamTypes = function(par.set, df.cols = FALSE, df.discretes.as.factor = TRUE
         "integervector", "integer",
         "discrete", "character",
         "discretevector", "character",
-        "logicalvector", "logical"
+        "logicalvector", "logical",
+        "charactervector", "character"
       )
     }
   }
@@ -63,5 +66,5 @@ getParamTypes = function(par.set, df.cols = FALSE, df.discretes.as.factor = TRUE
     getParamIds(par.set, repeated = df.cols, with.nr = with.nr)
   else
     NULL
-  setNames(types, ns)
+  return(setNames(types, ns))
 }

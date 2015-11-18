@@ -41,6 +41,7 @@ test_that("mixed paramset 2", {
   expect_true(!isFeasible(ps, list(2,0,"char")))
   expect_equal(getLower(ps), c(x1 = -1, x2 = 0))
   expect_equal(getUpper(ps), c(x1= 1, x2 = Inf))
+  expect_true(isFeasible(ps, list(x3 = 2L, x1 = 0)))
 })
 
 test_that("cannot build param set from wrong stuff", {
@@ -87,9 +88,17 @@ test_that("combination with c works", {
     makeDiscreteParam("w", values = 1:2),
     makeLogicalParam("x")
   )
+  # ps with "difficult" name
+  ps3 = makeParamSet(
+    makeNumericParam("params")
+  )
   ps = c(ps1, ps2)
   expect_equal(length(ps$pars), 4)
   expect_equal(getParamIds(ps), c(getParamIds(ps1), getParamIds(ps2)))
+
+  ps = c(ps1, ps3)
+  expect_equal(length(ps$pars), 3)
+  expect_equal(getParamIds(ps), c(getParamIds(ps1), getParamIds(ps3)))
 })
 
 
@@ -137,7 +146,7 @@ test_that("makeNumericParamset", {
 
 test_that("requires works", {
   ps = makeParamSet(
-    makeDiscreteParam("x", values = c("a", "b")),
+    makeDiscreteParam("x", values = c("a", "b"), default = "a"),
     makeNumericParam("y", requires = quote(x == "a")),
     makeIntegerVectorParam("z", len = 2, requires = quote(x == "b"))
   )
@@ -146,6 +155,23 @@ test_that("requires works", {
   expect_false(isFeasible(ps, list(x = "a", y = NA, z = c(NA, NA))))
   expect_false(isFeasible(ps, list(x = "b", y = 1, z = c(2,2))))
   expect_true(isFeasible(ps, list(x = "b", y = NA, z = c(2,2))))
+  expect_true(isRequiresOk(ps, list(x = "a")))
+  expect_true(isRequiresOk(ps, list(x = "c"))) #out of bound is supposed to be ignored
+  expect_true(isRequiresOk(ps, list(y = 1)))
+  expect_error(isRequiresOk(ps, list(y = 1), use.defaults = FALSE))
+  expect_error(isRequiresOk(ps, list(y = 1, x = "b")), 'x == "a"')
+})
+
+test_that("requires chains work", {
+  ps = makeParamSet(
+    makeLogicalLearnerParam("a", default = FALSE),
+    makeLogicalLearnerParam("b", default = FALSE, requires = quote(a == TRUE)),
+    makeLogicalLearnerParam("c", default = FALSE, requires = quote(b == TRUE))
+  )
+  expect_true(isFeasible(ps, list(a = FALSE, b = NA, c = NA)))
+  expect_true(isFeasible(ps, list(a = TRUE, b = FALSE, c = NA)))
+  expect_true(isFeasible(ps, list(a = TRUE, b = TRUE, c = FALSE)))
+  expect_true(isFeasible(ps, list(a = TRUE, b = TRUE, c = TRUE)))
 })
 
 test_that("print works", {

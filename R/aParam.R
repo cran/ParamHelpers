@@ -31,11 +31,14 @@
 #'   you are also allowed to pass a list of quite \dQuote{complex} R objects,
 #'   which are used as discrete choices. If you do the latter,
 #'   the elements must be uniquely named, so that the names can be used
-#'   as internal represenatations for the choice.
+#'   as internal representations for the choice.
 #' @param cnames [\code{character}]\cr
 #'   Component names for vector params (except discrete).
 #'   Every function in this package that creates vector values for such a param, will name
 #'   that vector with \code{cnames}.
+#' @param allow.inf [\code{logical(1)}]\cr
+#'   Allow infinite values for numeric and numericvector params to be feasible settings.
+#'   Default is \code{FALSE}.
 #' @param default [any]\cr
 #'   Default value used in learner.
 #'   If this argument is missing, it means no default value is available.
@@ -49,6 +52,13 @@
 #'   this parameter only makes sense if its requirements are satisfied (dependent parameter).
 #'   Only really useful if the parameter is included in a \code{\link{ParamSet}}.
 #'   Default is \code{NULL} which means no requirements.
+#' @param tunable [\code{logical(1)}]\cr
+#'   Is this parameter tunable?
+#'   Defining a parameter to be not-tunable allows to mark arguments like, e.g., \dQuote{verbose} or
+#'   other purely technical stuff, and allows them to be excluded from later automatic optimization
+#'   procedures that would try to consider all available parameters.
+#'   Default is \code{TRUE} (except for \code{untyped}, \code{function}, \code{character} and
+#'   \code{characterVector}) which means it is tunable.
 #' @return [\code{\link{Param}}].
 #' @name Param
 #' @rdname Param
@@ -56,9 +66,12 @@
 #' makeNumericParam("x",lower = -1, upper = 1)
 #' makeNumericVectorParam("x", len = 2)
 #' makeDiscreteParam("y", values = c("a","b"))
+#' makeCharacterParam("z")
 NULL
 
-makeParam = function(id, type, len, lower, upper, values, cnames, default, trafo = NULL, requires = NULL) {
+makeParam = function(id, type, len, lower, upper, values, cnames, allow.inf = FALSE, default,
+  trafo = NULL, requires = NULL, tunable = TRUE) {
+
   #We cannot check default} for NULL or NA as this could be the default value!
   if (missing(default)) {
     has.default = FALSE
@@ -77,10 +90,12 @@ makeParam = function(id, type, len, lower, upper, values, cnames, default, trafo
     upper = upper,
     values = values,
     cnames = cnames,
+    allow.inf = allow.inf,
     has.default = has.default,
     default = default,
     trafo = trafo,
-    requires = requires
+    requires = requires,
+    tunable = tunable
   )
   if (has.default && !isFeasible(p, default))
     stop(p$id, " : 'default' must be a feasible parameter setting.")
@@ -101,6 +116,7 @@ getParPrintData = function(x, trafo = TRUE, used = TRUE, constr.clip = 40L) {
     Def = if (x$has.default) paramValueToString(x, x$default) else "-",
     Constr = constr,
     Req = ifelse(is.null(x$requires), "-", "Y"),
+    Tunable = x$tunable,
     stringsAsFactors = FALSE
   )
   if (trafo)

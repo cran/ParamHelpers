@@ -24,6 +24,10 @@ test_that("num param", {
 
   expect_equal(p$values, NULL)
 
+  # defaults
+  p = makeNumericParam(id = "x", allow.inf = TRUE, default = Inf)
+  expect_error(makeNumericParam(id = "x", allow.inf = FALSE, default = Inf), "feasible")
+
   ## Error conditions:
   expect_error(makeNumericParam(id = "x", lower = "bam", upper = 1))
   expect_error(makeNumericParam(id = "x", lower = NA, upper = 1))
@@ -213,6 +217,31 @@ test_that("logic vec param", {
   expect_true(!isFeasible(p, TRUE))
   expect_true(!isFeasible(p, FALSE))
   expect_true(!isFeasible(p, NULL))
+})
+
+test_that("character param", {
+  p = makeCharacterParam(id = "s")
+  expect_equal("character", p$type)
+  expect_true(isFeasible(p, collapse(sample(letters, 5L))))
+
+  expect_true(!isFeasible(p, 1L))
+  expect_true(!isFeasible(p, 1))
+  expect_true(!isFeasible(p, NULL))
+  expect_true(!isFeasible(p, factor("bam")))
+})
+
+test_that("character vec param", {
+  p = makeCharacterVectorParam(id = "x", len = 2)
+  expect_equal("charactervector", p$type)
+  expect_true(isFeasible(p, c("a", "b")))
+  expect_false(isFeasible(p, c(1, 1)))
+  expect_false(isFeasible(p, "a"))
+  expect_false(isFeasible(p, 1))
+
+  p = makeCharacterVectorParam(id = "x", len = 2, cnames = c("x1", "x2"))
+  expect_equal("charactervector", p$type)
+  expect_true(isFeasible(p, c(x1 = "a", x2 = "b")))
+  expect_false(isFeasible(p, c("a", "b")))
 })
 
 test_that("function param", {

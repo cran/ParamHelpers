@@ -35,12 +35,16 @@ hasLogical = function(par.set) {
 
 #' @export
 #' @rdname hasType
+hasCharacter = function(par.set) {
+  assertClass(par.set, "ParamSet")
+  return(hasSomeParamsOfTypes(par.set, types = c("character", "charactervector")))
+}
+
+#' @export
+#' @rdname hasType
 hasNumeric = function(par.set, include.int = TRUE) {
   assertClass(par.set, "ParamSet")
-  types = if (include.int)
-    c("numeric", "numericvector", "integer", "integervector")
-  else
-    c("numeric", "numericvector")
+  types = getNumericTypes(include.int = include.int)
   return(hasSomeParamsOfTypes(par.set, types = types))
 }
 
@@ -48,10 +52,18 @@ hasNumeric = function(par.set, include.int = TRUE) {
 
 # is at least one of types somewhere in par.set?
 hasSomeParamsOfTypes = function(par.set, types) {
-  any(types %in% getParamTypes(par.set, df.cols = FALSE, with.nr = FALSE , use.names = FALSE))
+  return(any(types %in% getParamTypes(par.set, df.cols = FALSE, with.nr = FALSE , use.names = FALSE)))
 }
 
 # are all param types contained in 'types'
 hasAllParamsOfTypes = function(par.set, types) {
-  all(getParamTypes(par.set, df.cols = FALSE, with.nr = FALSE , use.names = FALSE) %in% types)
+  return(all(getParamTypes(par.set, df.cols = FALSE, with.nr = FALSE , use.names = FALSE) %in% types))
+}
+
+# what types to consider numeric
+getNumericTypes = function(include.int = TRUE) {
+  if (include.int)
+    c("numeric", "numericvector", "integer", "integervector")
+  else
+    c("numeric", "numericvector")
 }

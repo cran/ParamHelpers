@@ -15,7 +15,7 @@ addOptPathEl.OptPathDF = function(op, x, y, dob = getOptPathLength(op)+1L, eol =
       stopf("Trying to add extra info to opt path, without enabling that option!")
     assertList(extra)
     if (!isProperlyNamed(extra))
-      stopf("'extra' must be propely named!")
+      stopf("'extra' must be properly named!")
     if (!all(sapply(extra, isScalarValue)))
       stopf("'extra' can currently only contain scalar values!")
     if (length(env$extra) > 0L) {
@@ -49,7 +49,6 @@ addOptPathEl.OptPathDF = function(op, x, y, dob = getOptPathLength(op)+1L, eol =
     }, ps$pars, x)
   }
 
-
   # add x and y
   x = recode(op$par.set, x)
   el = do.call(cbind, lapply(x, function(v) as.data.frame(t(v), stringsAsFactors = FALSE)))
@@ -68,7 +67,7 @@ addOptPathEl.OptPathDF = function(op, x, y, dob = getOptPathLength(op)+1L, eol =
   if (!is.null(env$exec.time))
     env$exec.time[k] = exec.time
 
-  invisible(NULL)
+  return(invisible(NULL))
 }
 
 

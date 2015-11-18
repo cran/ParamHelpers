@@ -64,8 +64,8 @@ makeOptPath = function(par.set, y.names, minimize, add.transformed.x = FALSE,
 
   n.y = length(y.names)
   ok = c("numeric", "integer", "numericvector", "integervector", "logical",
-    "logicalvector", "discrete", "discretevector")
-  if(length(par.set$pars) > length(filterParams(par.set, ok)$pars))
+    "logicalvector", "discrete", "discretevector", "character", "charactervector")
+  if(length(par.set$pars) > length(filterParams(par.set, type = ok)$pars))
     stop("OptPath can currently only be used for: ", paste(ok, collapse = ","))
   x.names = getParamIds(par.set)
   # be really sure that x and y columns are uniquely named
