@@ -20,10 +20,10 @@ Suggests: akima, eaf, emoa, GGally, ggplot2, gridExtra, irace (>=
         1.0.7), lhs, plyr, reshape2, soobench, testthat
 LazyData: yes
 ByteCompile: yes
-Version: 1.6
+Version: 1.7
 RoxygenNote: 5.0.1
 NeedsCompilation: yes
-Packaged: 2015-11-17 21:56:24 UTC; bischl
+Packaged: 2016-02-03 16:18:55 UTC; bischl
 Author: Bernd Bischl [aut, cre],
   Michel Lang [aut],
   Jakob Bossek [aut],
@@ -31,4 +31,4 @@ Author: Bernd Bischl [aut, cre],
   Karin Schork [aut]
 Maintainer: Bernd Bischl <bernd_bischl@gmx.net>
 Repository: CRAN
-Date/Publication: 2015-11-18 09:31:10
+Date/Publication: 2016-02-03 22:47:50
