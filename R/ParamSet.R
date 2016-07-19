@@ -1,7 +1,7 @@
 #' @title Construct a parameter set.
 #'
 #' @description
-#' \code{makeParamSet}: Contruct from a bunch of parameters.
+#' \code{makeParamSet}: Construct from a bunch of parameters.
 #'
 #' Multiple sets can be concatenated with \code{c}.
 #'
@@ -120,9 +120,9 @@ makeNumericParamSet = function(id = "x", len, lower = -Inf, upper = Inf, vector 
   } else {
     len = asInt(len)
   }
-  if (is.numeric(lower) && length(lower) == 1)
+  if (is.numeric(lower) && length(lower) == 1L)
     lower = rep(lower, len)
-  if (is.numeric(upper) && length(upper) == 1)
+  if (is.numeric(upper) && length(upper) == 1L)
     upper = rep(upper, len)
     assertNumeric(lower, len = len)
     assertNumeric(upper, len = len)
@@ -135,5 +135,3 @@ makeNumericParamSet = function(id = "x", len, lower = -Inf, upper = Inf, vector 
     ))
   }
 }
-
-

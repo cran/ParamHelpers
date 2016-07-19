@@ -1,5 +1,6 @@
-#' Get lower / upper bounds and allowed discrete values for parameters.
+#' @title Get lower / upper bounds and allowed discrete values for parameters.
 #'
+#' @description
 #' \code{getLower} and \code{getUpper} return a numerical vector of lower and upper
 #' bounds, \code{getValues} returns a list of possible value sets for discrete parameters.
 #'
@@ -52,11 +53,13 @@ getValues = function(par.set) {
 getBounds = function(par.set, type.of.bounds, with.nr = FALSE) {
   assertClass(par.set, "ParamSet")
   types = getParamTypes(par.set)
-  is.num = types %in% c("numeric", "integer", "numericvector", "integervector")
-  if (!any(is.num))
-    return(numeric(0))
-  bounds = lapply(par.set$pars[is.num], function(p) p[[type.of.bounds]])
+  # if we dont have numerics, return empty vector
+  if (!hasNumeric(par.set, include.int = TRUE))
+    return(numeric(0L))
+  # filter to numerics, and get bounds, flat-join them and name them
+  psnum = filterParamsNumeric(par.set,  include.int = TRUE)
+  bounds = lapply(psnum$pars, function(p) p[[type.of.bounds]])
   bounds = do.call(c, bounds)
-  names(bounds) = getParamIds2(par.set$pars[is.num], repeated = TRUE, with.nr = with.nr)
+  names(bounds) = getParamIds(psnum, repeated = TRUE, with.nr = with.nr)
   return(bounds)
 }

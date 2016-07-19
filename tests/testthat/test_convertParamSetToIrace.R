@@ -32,7 +32,9 @@ test_that("convertParamSetToIrace", {
   runIrace(ps, hook.run, max.exps = 300)
   ps = makeParamSet(
     makeDiscreteParam("x1", values = c("a", "b")),
-    makeLogicalParam("x2", requires = quote(x1 == "a"))
+    makeLogicalParam("x2", requires = quote(x1 == "a")),
+    makeLogicalParam("x3", requires =
+      quote(x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE" && x1 == "a" && x2 == "FALSE"))
   )
   ips = convertParamSetToIrace(ps)
   expect_false(identical(ips$constraints$x2, expression(TRUE)))
@@ -40,6 +42,8 @@ test_that("convertParamSetToIrace", {
     v = experiment$candidate
     if ((v$x1 == "a" && is.na(v$x2)) || (v$x1 == "b" && !is.na(v$x2)))
       stop("foo")
+    if ((v$x1 == "a" && v$x2 == "FALSE" && is.na(v$x3)) || (!(v$x1 == "a" && v$x2 == "FALSE") && !is.na(v$x3)))
+      stop("requires failed")
     1
   }
   runIrace(ps, hook.run, max.exps = 300)
@@ -66,4 +70,19 @@ test_that("convertParamSetToIrace uses correct boundaries", {
     c(kernel = "character", sigma = "numeric", myInt = "integer", Binar = "character"))
   expect_identical(ips$boundary$sigma, as.numeric(unlist(ps$pars$sigma[c("lower", "upper")])))
   expect_identical(ips$boundary$myInt, as.integer(unlist(ps$pars$myInt[c("lower", "upper")])))
+})
+
+test_that("convertParamSetToIrace work with vecparam", { # has issue here, see 85
+  ps = makeParamSet(
+    makeNumericVectorParam("a", len=2, -10, 10),
+    makeDiscreteParam("b", c("v", "w")),
+    makeNumericVectorParam("c", len=2, -10, 10)
+  )
+  i = convertParamSetToIrace(ps)
+  b = i$boundary
+  expect_equal(b$a1, c(-10, 10))
+  expect_equal(b$a2, c(-10, 10))
+  expect_equal(b$b, c("v", "w"))
+  expect_equal(b$c1, c(-10, 10))
+  expect_equal(b$c2, c(-10, 10))
 })

@@ -39,7 +39,7 @@ setOptPathElEOL = function(op, index, eol) {
 #'
 #' @description
 #' Changes the argument in-place.
-#' Note that when adding parameters that have associated tranformations, it is probably
+#' Note that when adding parameters that have associated transformations, it is probably
 #' best to add the untransformed values to the path. Otherwise you have to switch off the
 #' feasibility check, as constraints might now not hold anymore.
 #'
@@ -65,8 +65,10 @@ setOptPathElEOL = function(op, index, eol) {
 #'   Default is \code{NA}.
 #' @param extra [\code{list}]\cr
 #'   Possible list of extra values to store.
-#'   The list must be fully named, can currently only contain scalar values and must always
-#'   be in the same order of all calls of \code{addOptPathEl}.
+#'   The list must be fully named. The list can contain nonscalar values, but
+#'   these nonscalar entries must have a name starting with a dot (\code{.}).
+#'   Other entries must be scalar, and must be in the same order of all calls of
+#'   \code{addOptPathEl}.
 #'   Default is \code{NULL}
 #' @param check.feasible [\code{logical(1)}]\cr
 #'   Should \code{x} be checked with \code{\link{isFeasible}}?
@@ -89,5 +91,3 @@ addOptPathEl = function(op, x, y, dob = getOptPathLength(op)+1L, eol = as.intege
 
   UseMethod("addOptPathEl")
 }
-
-

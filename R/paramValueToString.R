@@ -1,5 +1,6 @@
-#' Convert a value to a string.
+#' @title Convert a value to a string.
 #'
+#' @description
 #' Useful helper for logging.
 #' For discrete parameter values always the name of the discrete value is used.
 #'
@@ -9,7 +10,7 @@
 #'   For discrete parameters their values must be used, not their names.
 #' @param show.missing.values [\code{logical(1)}]\cr
 #'   Display \dQuote{NA} for parameters, which have no setting, because their requirements are not
-#'   satified (dependent parameters), instead of displaying nothing?
+#'   satisfied (dependent parameters), instead of displaying nothing?
 #'   Default is \code{FALSE}.
 #' @param num.format [\code{character(1)}]\cr
 #'   Number format for output of numeric parameters. See the details section of the manual for
@@ -46,13 +47,14 @@ paramValueToString = function(par, x, show.missing.values = FALSE, num.format = 
 #' @export
 paramValueToString.Param = function(par, x, show.missing.values = FALSE, num.format = "%.3g") {
   # handle missings
-  if (isMissingValue(x)) {
+  if (isScalarNA(x)) {
     if (show.missing.values)
       return("NA")
     else
       return("")
   }
 
+  # FIXME: switch
   type = par$type
   if (type == "numeric")
     sprintf(num.format, x)
@@ -88,11 +90,11 @@ paramValueToString.ParamSet = function(par, x, show.missing.values = FALSE, num.
   rest = setdiff(names(x), names(par$pars))
   if (length(rest) > 0L)
     stopf("Not all names of 'x' occur in par set 'par': %s", collapse(rest))
-  res = character(0)
+  res = character(0L)
   for (i in seq_along(x)) {
     pn = names(x)[i]
     val = x[[pn]]
-    if (show.missing.values || !isMissingValue(val))  {
+    if (show.missing.values || !isScalarNA(val))  {
       p = par$pars[[pn]]
       res[length(res)+1] = sprintf("%s=%s", pn, paramValueToString(p, val, show.missing.values, num.format))
     }
