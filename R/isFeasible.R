@@ -19,6 +19,7 @@
 #'   which refers to an unpassed param.)
 #' @param use.defaults [\code{logical(1)}]\cr
 #'   Whether defaults of the \code{\link{Param}}/\code{\link{ParamSet}} should be used if no values are supplied.
+#'   If the defaults have requirements that are not met by \code{x} it will be feasible nonetheless.
 #'   Default is \code{FALSE}.
 #' @param filter [\code{logical(1)}]\cr
 #'   Whether the \code{\link{ParamSet}} should be reduced to the space of the given Param Values.
@@ -109,31 +110,33 @@ isFeasible.ParamSet = function(par, x, use.defaults = FALSE, filter = FALSE) {
 
 # are the contraints ok for value of a param (not considering requires)
 constraintsOkParam = function(par, x) {
+  if (specialValsOk(par, x))
+    return(TRUE)
   type = par$type
   # this should work in any! case.
   if (type == "untyped")
     return(TRUE)
   inValues = function(v) any(vlapply(par$values, function(w) isTRUE(all.equal(w, v))))
   ok = if (type == "numeric")
-    is.numeric(x) && length(x) == 1 && (par$allow.inf || is.finite(x)) && x >= par$lower && x <= par$upper
+    is.numeric(x) && length(x) == 1 && (par$allow.inf || is.finite(x)) && checkBoundsOrExpr(par = par, x = x)
   else if (type == "integer")
-    is.numeric(x) && length(x) == 1 && is.finite(x) && x >= par$lower && x <= par$upper && x == as.integer(x)
+    is.numeric(x) && length(x) == 1 && is.finite(x) && checkBoundsOrExpr(par = par, x = x) && x == as.integer(x)
   else if (type == "numericvector")
-    is.numeric(x) && length(x) == par$len && all((par$allow.inf | is.finite(x)) & x >= par$lower & x <= par$upper)
+    is.numeric(x) && checkLength(par, x) && all((par$allow.inf | is.finite(x)) & checkBoundsOrExprVec(par = par, x = x))
   else if (type == "integervector")
-    is.numeric(x) && length(x) == par$len && all(is.finite(x) & x >= par$lower & x <= par$upper & x == as.integer(x))
+    is.numeric(x) && checkLength(par, x) && all(is.finite(x) & checkBoundsOrExprVec(par = par, x = x) & x == as.integer(x))
   else if (type == "discrete")
     inValues(x)
   else if (type == "discretevector")
-    is.list(x) && length(x) == par$len && all(vlapply(x, inValues))
+    is.list(x) && checkLength(par, x) && all(vlapply(x, inValues))
   else if (type == "logical")
     is.logical(x) && length(x) == 1 && !is.na(x)
   else if (type == "logicalvector")
-    is.logical(x) && length(x) == par$len && !anyMissing(x)
+    is.logical(x) && checkLength(par, x) && !anyMissing(x)
   else if (type == "character")
     is.character(x) && length(x) == 1 && !is.na(x)
   else if (type == "charactervector")
-    is.character(x) && length(x) == par$len && !anyMissing(x)
+    is.character(x) && checkLength(par, x) && !anyMissing(x)
   else if (type == "function")
     is.function(x)
 
@@ -145,17 +148,19 @@ constraintsOkParam = function(par, x) {
 }
 
 constraintsOkLearnerParam = function(par, x) {
+  if (specialValsOk(par, x))
+    return(TRUE)
   inValues = function(v) any(vlapply(par$values, function(w) isTRUE(all.equal(w, v))))
   type = par$type
   # extra case for unkown dim in vector
   if (type == "numericvector")
-    is.numeric(x) && (is.na(par$len) || length(x) == par$len) && all(is.finite(x) & x >= par$lower & x <= par$upper)
+    is.numeric(x) && checkLength(par, x) && all(is.finite(x) & checkBoundsOrExprVec(par = par, x = x))
   else if (type == "integervector")
-    is.numeric(x) && (is.na(par$len) || length(x) == par$len) && all(is.finite(x) & x >= par$lower & x <= par$upper & x == as.integer(x))
+    is.numeric(x) && checkLength(par, x) && all(is.finite(x) & checkBoundsOrExprVec(par = par, x = x) & x == as.integer(x))
   else if (type == "logicalvector")
-    is.logical(x) && (is.na(par$len) || length(x) == par$len) && !anyMissing(x)
+    is.logical(x) && checkLength(par, x) && !anyMissing(x)
   else if (type == "discretevector")
-    is.list(x) && (is.na(par$len) || length(x) == par$len) && all(vlapply(x, inValues))
+    is.list(x) && checkLength(par, x) && all(vlapply(x, inValues))
   else
     constraintsOkParam(par, x)
 }
@@ -168,3 +173,18 @@ requiresOk = function(par, x) {
     isTRUE(eval(par$requires, envir = x))
   }
 }
+
+# check if x is one of the pre defined special.vals and return TRUE in case.
+specialValsOk = function(par, x) {
+  any(vlapply(par$special.vals, function(special.val) isTRUE(all.equal(x, special.val))))
+}
+
+# helper function which checks whether 'x' lies within the boundaries (unless they are expressions)
+checkBoundsOrExpr = function(par, x)
+  (is.expression(par$lower) || x >= par$lower) && (is.expression(par$upper) || x <= par$upper)
+
+checkBoundsOrExprVec = function(par, x)
+  (is.expression(par$lower) | x >= par$lower) & (is.expression(par$upper) | x <= par$upper)
+
+checkLength = function(par, x)
+  (is.expression(par$len) || is.na(par$len) || length(x) == par$len)
