@@ -1,3 +1,13 @@
+ParamHelpers_1.10:
+- adapt to irace 2.1 API changes
+- new functions
+-- getRequirements
+-- isSpecialValue
+-- getTypeStringsLogical, getTypeStringsCharacter, getTypeStringsAll
+-- isNumericTypeString, isIntegerTypeString,
+   isDiscreteTypeString, isLogicalTypeString, isCharacterTypeString, isVectorTypeString
+-- generateDesignOfDefaults
+
 ParamHelpers_1.9:
 - Many parameters can now be expressions which can be evaluated later while
   providing a lookup dictionary.
@@ -8,6 +18,7 @@ ParamHelpers_1.9:
 -- hasExpression
 
 ParamHelpers_1.8:
+- plots produced by renderOptPathPlot, plotOptPath are now always nicely aligned
 - removed soobench from SUGGESTS and removed function extractParamSetFromSooFunction
 - hasDiscrete: added arg "include.logical"
 - getParamSet has become a generic

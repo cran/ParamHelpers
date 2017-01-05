@@ -6,13 +6,10 @@
 \alias{isInteger}
 \alias{isLogical}
 \alias{isNumeric}
-\alias{isNumericStrict}
 \alias{isType}
 \title{Check parameter / parameter set contain ONLY a certain type.}
 \usage{
 isNumeric(par, include.int = TRUE)
-
-isNumericStrict(par)
 
 isDiscrete(par, include.logical = TRUE)
 
@@ -35,7 +32,7 @@ Are logicals also considered to be discrete?
 Default is \code{TRUE}.}
 }
 \value{
-[\code{logical(1)}].
+[\code{logical(1)}]
 }
 \description{
 An empty param set is considered to be of all types.
