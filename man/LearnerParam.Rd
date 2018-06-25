@@ -2,16 +2,16 @@
 % Please edit documentation in R/LearnerParam.R, R/makeLearnerParamFuns.R
 \name{LearnerParam}
 \alias{LearnerParam}
-\alias{makeDiscreteLearnerParam}
-\alias{makeDiscreteVectorLearnerParam}
-\alias{makeFunctionLearnerParam}
-\alias{makeIntegerLearnerParam}
-\alias{makeIntegerVectorLearnerParam}
-\alias{makeLogicalLearnerParam}
-\alias{makeLogicalVectorLearnerParam}
 \alias{makeNumericLearnerParam}
 \alias{makeNumericVectorLearnerParam}
+\alias{makeIntegerLearnerParam}
+\alias{makeIntegerVectorLearnerParam}
+\alias{makeDiscreteLearnerParam}
+\alias{makeDiscreteVectorLearnerParam}
+\alias{makeLogicalLearnerParam}
+\alias{makeLogicalVectorLearnerParam}
 \alias{makeUntypedLearnerParam}
+\alias{makeFunctionLearnerParam}
 \title{Create a description object for a parameter of a machine learning algorithm.}
 \usage{
 makeNumericLearnerParam(id, lower = -Inf, upper = Inf, allow.inf = FALSE,
@@ -85,8 +85,6 @@ this parameter only makes sense if its requirements are satisfied (dependent par
 Can be an object created either with \code{expression} or \code{quote},
 the former type is auto-converted into the later.
 Only really useful if the parameter is included in a \code{\link{ParamSet}}.
-Note that if your dependent parameter is a logical Boolean you need to verbosely write
-\code{requires = quote(a == TRUE)} and not \code{requires = quote(a)}.
 Default is \code{NULL} which means no requirements.}
 
 \item{tunable}{[\code{logical(1)}]\cr
@@ -127,4 +125,3 @@ The S3 class is a \code{\link{Param}} which additionally stores these elements:
 
 See the note in \code{\link{Param}} about being able to pass expressions to certain arguments.
 }
-

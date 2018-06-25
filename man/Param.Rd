@@ -2,18 +2,18 @@
 % Please edit documentation in R/aParam.R, R/makeParamFuns.R
 \name{Param}
 \alias{Param}
-\alias{makeCharacterParam}
-\alias{makeCharacterVectorParam}
-\alias{makeDiscreteParam}
-\alias{makeDiscreteVectorParam}
-\alias{makeFunctionParam}
+\alias{makeNumericParam}
+\alias{makeNumericVectorParam}
 \alias{makeIntegerParam}
 \alias{makeIntegerVectorParam}
 \alias{makeLogicalParam}
 \alias{makeLogicalVectorParam}
-\alias{makeNumericParam}
-\alias{makeNumericVectorParam}
+\alias{makeDiscreteParam}
+\alias{makeDiscreteVectorParam}
+\alias{makeFunctionParam}
 \alias{makeUntypedParam}
+\alias{makeCharacterParam}
+\alias{makeCharacterVectorParam}
 \title{Create a description object for a parameter.}
 \usage{
 makeNumericParam(id, lower = -Inf, upper = Inf, allow.inf = FALSE,
@@ -91,8 +91,6 @@ this parameter only makes sense if its requirements are satisfied (dependent par
 Can be an object created either with \code{expression} or \code{quote},
 the former type is auto-converted into the later.
 Only really useful if the parameter is included in a \code{\link{ParamSet}}.
-Note that if your dependent parameter is a logical Boolean you need to verbosely write
-\code{requires = quote(a == TRUE)} and not \code{requires = quote(a)}.
 Default is \code{NULL} which means no requirements.}
 
 \item{tunable}{[\code{logical(1)}]\cr
@@ -158,4 +156,3 @@ makeNumericVectorParam("x", len = 2)
 makeDiscreteParam("y", values = c("a","b"))
 makeCharacterParam("z")
 }
-

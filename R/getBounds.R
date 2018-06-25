@@ -42,7 +42,6 @@
 #' )
 #' getLower(par.vals)
 #' getUpper(par.vals, dict = list(n = 12))
-#' @export
 getLower = function(obj, with.nr = FALSE, dict = NULL) {
   getBounds(obj, type.of.bounds = "lower", with.nr = with.nr, dict = dict)
 }
@@ -77,7 +76,7 @@ getValues.ParamSet = function(obj, dict = NULL) {
   assertClass(obj, "ParamSet")
   assertList(dict, names = "unique", null.ok = TRUE)
   types = getParamTypes(obj)
-  is.disc = types %in% getTypeStringsDiscrete()
+  is.disc = types %fin% getTypeStringsDiscrete()
   # only consider params with one of the types from above
   if (!any(is.disc))
     return(list())
@@ -109,7 +108,7 @@ getBounds.Param = function(obj, type.of.bounds, with.nr = FALSE, dict = NULL) {
   assertClass(obj, "Param")
   assertList(dict, names = "unique", null.ok = TRUE)
   # if the Param is non-numeric, return NULL
-  if (!(obj$type %in% getTypeStringsNumeric()))
+  if (!(obj$type %fin% getTypeStringsNumeric()))
     return(NULL)
   # filter to numerics, and get bounds, flat-join them and name them
   bound = obj[[type.of.bounds]]
