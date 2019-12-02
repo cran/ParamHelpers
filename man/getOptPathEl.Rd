@@ -7,36 +7,39 @@
 getOptPathEl(op, index)
 }
 \arguments{
-\item{op}{[\code{\link{OptPath}}]\cr
+\item{op}{\link{OptPath}\cr
 Optimization path.}
 
-\item{index}{[\code{integer(1)}]\cr
+\item{index}{(\code{integer(1)})\cr
 Index of element.}
 }
 \value{
-List with elements \code{x} [named \code{list}], \code{y} [named \code{numeric}],
-  \code{dob} [\code{integer(1)}], \code{eol} [\code{integer(1)}].
-  The elements \code{error.message} [\code{character(1)}],
-  \code{exec.time} [\code{numeric(1)}] and \code{extra} [named \code{list}] are
-  there if the respective options in \code{\link{OptPath}} are enabled.
+List with elements \code{x} (named \code{list}), \code{y} (named \code{numeric}),
+\code{dob} \code{integer(1)}, \code{eol} \code{integer(1)}.
+The elements \code{error.message} (\code{character(1)}),
+\code{exec.time} (\code{numeric(1)}) and \code{extra} (named \code{list}) are
+there if the respective options in \code{\link[=OptPath]{OptPath()}} are enabled.
 }
 \description{
 Dependent parameters whose requirements are not satisfied are represented by a scalar NA
 in the elements of \code{x} of the return value.
 }
 \seealso{
-Other optpath: \code{\link{OptPath}},
-  \code{\link{addOptPathEl}},
-  \code{\link{getOptPathBestIndex}},
-  \code{\link{getOptPathCols}},
-  \code{\link{getOptPathCol}}, \code{\link{getOptPathDOB}},
-  \code{\link{getOptPathEOL}},
-  \code{\link{getOptPathErrorMessages}},
-  \code{\link{getOptPathExecTimes}},
-  \code{\link{getOptPathLength}},
-  \code{\link{getOptPathParetoFront}},
-  \code{\link{getOptPathX}}, \code{\link{getOptPathY}},
-  \code{\link{setOptPathElDOB}},
-  \code{\link{setOptPathElEOL}}
+Other optpath: 
+\code{\link{OptPath}},
+\code{\link{addOptPathEl}()},
+\code{\link{getOptPathBestIndex}()},
+\code{\link{getOptPathCols}()},
+\code{\link{getOptPathCol}()},
+\code{\link{getOptPathDOB}()},
+\code{\link{getOptPathEOL}()},
+\code{\link{getOptPathErrorMessages}()},
+\code{\link{getOptPathExecTimes}()},
+\code{\link{getOptPathLength}()},
+\code{\link{getOptPathParetoFront}()},
+\code{\link{getOptPathX}()},
+\code{\link{getOptPathY}()},
+\code{\link{setOptPathElDOB}()},
+\code{\link{setOptPathElEOL}()}
 }
 \concept{optpath}

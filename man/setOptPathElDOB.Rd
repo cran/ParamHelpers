@@ -7,13 +7,13 @@
 setOptPathElDOB(op, index, dob)
 }
 \arguments{
-\item{op}{[\code{\link{OptPath}}]\cr
+\item{op}{\link{OptPath}\cr
 Optimization path.}
 
-\item{index}{[\code{integer}]\cr
+\item{index}{\link{integer}\cr
 Vector of indices of elements.}
 
-\item{dob}{[integer] \cr
+\item{dob}{\link{integer} \cr
 Dates of birth, single value or same length of \code{index}.}
 }
 \value{
@@ -23,17 +23,21 @@ Nothing.
 Set the dates of birth of parameter values, in-place.
 }
 \seealso{
-Other optpath: \code{\link{OptPath}},
-  \code{\link{addOptPathEl}},
-  \code{\link{getOptPathBestIndex}},
-  \code{\link{getOptPathCols}},
-  \code{\link{getOptPathCol}}, \code{\link{getOptPathDOB}},
-  \code{\link{getOptPathEOL}}, \code{\link{getOptPathEl}},
-  \code{\link{getOptPathErrorMessages}},
-  \code{\link{getOptPathExecTimes}},
-  \code{\link{getOptPathLength}},
-  \code{\link{getOptPathParetoFront}},
-  \code{\link{getOptPathX}}, \code{\link{getOptPathY}},
-  \code{\link{setOptPathElEOL}}
+Other optpath: 
+\code{\link{OptPath}},
+\code{\link{addOptPathEl}()},
+\code{\link{getOptPathBestIndex}()},
+\code{\link{getOptPathCols}()},
+\code{\link{getOptPathCol}()},
+\code{\link{getOptPathDOB}()},
+\code{\link{getOptPathEOL}()},
+\code{\link{getOptPathEl}()},
+\code{\link{getOptPathErrorMessages}()},
+\code{\link{getOptPathExecTimes}()},
+\code{\link{getOptPathLength}()},
+\code{\link{getOptPathParetoFront}()},
+\code{\link{getOptPathX}()},
+\code{\link{getOptPathY}()},
+\code{\link{setOptPathElEOL}()}
 }
 \concept{optpath}

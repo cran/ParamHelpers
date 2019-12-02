@@ -4,34 +4,39 @@
 \alias{getOptPathParetoFront}
 \title{Get indices of pareto front of optimization path.}
 \usage{
-getOptPathParetoFront(op, y.names = op$y.names, dob = op$env$dob,
-  eol = op$env$eol, index = FALSE)
+getOptPathParetoFront(
+  op,
+  y.names = op$y.names,
+  dob = op$env$dob,
+  eol = op$env$eol,
+  index = FALSE
+)
 }
 \arguments{
-\item{op}{[\code{\link{OptPath}}]\cr
+\item{op}{\link{OptPath}\cr
 Optimization path.}
 
-\item{y.names}{[\code{character}]\cr
+\item{y.names}{\link{character}\cr
 Names of performance measures to construct pareto front for.
 Default is all performance measures.}
 
-\item{dob}{[\code{integer}]\cr
+\item{dob}{\link{integer}\cr
 Vector of date-of-birth values to further subset the result.
 Only elements with a date-of-birth included in \code{dob} are selected.
 Default is all.}
 
-\item{eol}{[\code{integer}]\cr
+\item{eol}{\link{integer}\cr
 Vector of end-of-life values to further subset the result.
 Only elements with an end-of-life included in \code{eol} are selected.
 Default is all.}
 
-\item{index}{[\code{logical(1)}]\cr
+\item{index}{(\code{logical(1)})\cr
 Return indices into path of front or y-matrix of nondominated points?
 Default is \code{FALSE}.}
 }
 \value{
-[\code{matrix} | \code{integer}]. Either matrix (with named columns) of points of front
-  in objective space or indices into path for front.
+\code{matrix} | \code{integer}. Either matrix (with named columns) of points of
+front in objective space or indices into path for front.
 }
 \description{
 Get indices of pareto front of optimization path.
@@ -48,17 +53,21 @@ getOptPathParetoFront(op)
 getOptPathParetoFront(op, index = TRUE)
 }
 \seealso{
-Other optpath: \code{\link{OptPath}},
-  \code{\link{addOptPathEl}},
-  \code{\link{getOptPathBestIndex}},
-  \code{\link{getOptPathCols}},
-  \code{\link{getOptPathCol}}, \code{\link{getOptPathDOB}},
-  \code{\link{getOptPathEOL}}, \code{\link{getOptPathEl}},
-  \code{\link{getOptPathErrorMessages}},
-  \code{\link{getOptPathExecTimes}},
-  \code{\link{getOptPathLength}},
-  \code{\link{getOptPathX}}, \code{\link{getOptPathY}},
-  \code{\link{setOptPathElDOB}},
-  \code{\link{setOptPathElEOL}}
+Other optpath: 
+\code{\link{OptPath}},
+\code{\link{addOptPathEl}()},
+\code{\link{getOptPathBestIndex}()},
+\code{\link{getOptPathCols}()},
+\code{\link{getOptPathCol}()},
+\code{\link{getOptPathDOB}()},
+\code{\link{getOptPathEOL}()},
+\code{\link{getOptPathEl}()},
+\code{\link{getOptPathErrorMessages}()},
+\code{\link{getOptPathExecTimes}()},
+\code{\link{getOptPathLength}()},
+\code{\link{getOptPathX}()},
+\code{\link{getOptPathY}()},
+\code{\link{setOptPathElDOB}()},
+\code{\link{setOptPathElEOL}()}
 }
 \concept{optpath}
