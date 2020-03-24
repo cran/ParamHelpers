@@ -1,3 +1,7 @@
+# ParamHelpers 1.14
+
+- Fixes to work with R-4.0.0
+
 # ParamHelpers 1.13
 
 - `trafo` allowed in DiscreteVectorParam.

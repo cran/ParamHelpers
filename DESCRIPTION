@@ -1,7 +1,7 @@
 Package: ParamHelpers
 Title: Helpers for Parameters in Black-Box Optimization, Tuning and
         Machine Learning
-Version: 1.13
+Version: 1.14
 Authors@R: 
     c(person(given = "Bernd",
              family = "Bischl",
@@ -50,9 +50,9 @@ Suggests: akima, covr, eaf, emoa, GGally, ggplot2, grid, gridExtra,
 ByteCompile: yes
 Encoding: UTF-8
 LazyData: yes
-RoxygenNote: 7.0.1
+RoxygenNote: 7.1.0
 NeedsCompilation: yes
-Packaged: 2019-12-02 14:18:21 UTC; richter
+Packaged: 2020-03-24 09:21:07 UTC; jakob
 Author: Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Michel Lang [aut] (<https://orcid.org/0000-0001-9754-0393>),
   Jakob Richter [cre, aut] (<https://orcid.org/0000-0003-4481-5554>),
@@ -62,4 +62,4 @@ Author: Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>),
   Pascal Kerschke [aut]
 Maintainer: Jakob Richter <code@jakob-r.de>
 Repository: CRAN
-Date/Publication: 2019-12-02 15:00:02 UTC
+Date/Publication: 2020-03-24 10:10:05 UTC
