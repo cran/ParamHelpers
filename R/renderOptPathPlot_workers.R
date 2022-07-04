@@ -130,8 +130,8 @@ plot2D = function(op, .alpha, .type, log, names, short.names, y.name = NULL, op.
 
   # prepare contour plot
   if (!is.null(y.name)) {
-    requirePackages(c("akima", "reshape2"), why = "renderOptPathPlot plot2D")
-    fld = with(cbind(op, op.y), akima::interp(x = get(names[1L]), y = get(names[2L]), z = get(y.name)))
+    requirePackages(c("interp", "reshape2"), why = "renderOptPathPlot plot2D")
+    fld = with(cbind(op, op.y), interp::interp(x = get(names[1L]), y = get(names[2L]), z = get(y.name)))
     df = reshape2::melt(fld$z, na.rm = TRUE)
     names(df) = c(names, y.name)
     df[[names[1L]]] = fld$x[df[[names[1L]]]]

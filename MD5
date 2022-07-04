@@ -1,4 +1,4 @@
-1f8fe3be117531ccfbd627c3a990b087 *DESCRIPTION
+659479ce441a2de0ffd15dcb5e703a26 *DESCRIPTION
 6d62c17754c6c23eb1de160c2004968e *LICENSE
 cd99a6da61285b73913abec0fd05dbb1 *NAMESPACE
 26d9635eee92c8359cc2504759b4bbc4 *NEWS.md
@@ -57,8 +57,8 @@ f73d3d4aeec4e0cfbe9f59ea1cd52a7f *R/makeLearnerParamFuns.R
 560b52289b49dfde76381ab4914ed8e2 *R/paramValueToString.R
 8087a8295d6c0bf96c1b1d7d37489231 *R/removeMissingValues.R
 1bde90e3c42c739e0f471650b9ef9600 *R/renderOptPathPlot.R
-eb09dc3a444f3e1888b0b5b4e46a7f35 *R/renderOptPathPlot_helpers.R
-da746b9a6aa52ecfcbb3e88386d01444 *R/renderOptPathPlot_workers.R
+1c8724972d5254bfbfc6f69a46a65023 *R/renderOptPathPlot_helpers.R
+663d6fc64f506135361ab1539be748a6 *R/renderOptPathPlot_workers.R
 d063288413dfd635fe8b45b0e0a98145 *R/repairPoint.R
 5cc516b9f23cd978f30727c8600989ba *R/sample.R
 0a7974d5b1e0cc2c6ea9cc6287ee39e5 *R/setValueCNames.R
