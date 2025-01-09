@@ -1,5 +1,3 @@
-context("plotYTrace")
-
 test_that("plotYTrace works", {
   makeArtOP = function() {
     ps = makeNumericParamSet(len = 1L)
@@ -10,7 +8,7 @@ test_that("plotYTrace works", {
     for (i in 1:20) {
       addOptPathEl(op, x = list(
         x = X[i * 2]),
-      y = X[ i * 2 - 1],
+      y = X[i * 2 - 1],
       dob = dob[i],
       exec.time = rexp(1))
     }
@@ -25,10 +23,10 @@ test_that("plotYTrace works", {
 
 
   pl = renderYTraces(opt.paths, over.time = "dob")
-  expect_is(pl, "gg")
-  expect_is(pl, "ggplot")
+  expect_class(pl, "gg")
+  expect_class(pl, "ggplot")
   pl = renderYTraces(opt.paths, over.time = "exec.time")
-  expect_is(pl, "gg")
-  expect_is(pl, "ggplot")
+  expect_class(pl, "gg")
+  expect_class(pl, "ggplot")
   plotYTraces(opt.paths)
 })

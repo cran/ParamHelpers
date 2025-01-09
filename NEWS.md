@@ -1,3 +1,9 @@
+# ParamHelpers 1.14.2
+
+- Fix documentation.
+- Compatibility for new irace version
+- Fix use of deprecated ggplot2 functionality
+
 # ParamHelpers 1.14
 
 - Fixes to work with R-4.0.0

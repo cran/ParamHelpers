@@ -15,7 +15,7 @@ getOptPathLims = function(xlim, ylim, op.x, op.y, iters, scale) {
   for (space in c("XSpace", "YSpace")) {
     op.frame = if (space == "XSpace") op.x else op.y
     dim = ncol(op.frame)
-    classes = BBmisc::vcapply(op.frame, function(x) class(x))
+    classes = BBmisc::vcapply(op.frame, class)
 
     # For Multi-D Plot, no limits are needed. Warn, if the user specified some
     # and set to NULL
